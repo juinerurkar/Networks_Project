@@ -1,0 +1,184 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<table cellspacing="0" align="center" style="border: none;">
+  <caption align="bottom" style="margin-top:0.3em;">Statistical models</caption>
+  <tr>
+    <th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;"></th>
+    <th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;"><b>Climate 95-00</b></th>
+    <th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;"><b>Climate 02-05</b></th>
+    <th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;"><b>Telecom</b></th>
+    <th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;"><b>PM Visp</b></th>
+    <th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;"><b>Chemicals</b></th>
+  </tr>
+  <tr>
+    <td style="padding-right: 12px; border: none;">Edges</td>
+    <td style="padding-right: 12px; border: none;">-5.25<sup style="vertical-align: 4px;">***</sup></td>
+    <td style="padding-right: 12px; border: none;">-5.66</td>
+    <td style="padding-right: 12px; border: none;">-10.38<sup style="vertical-align: 4px;">**</sup></td>
+    <td style="padding-right: 12px; border: none;">-3.58<sup style="vertical-align: 4px;">**</sup></td>
+    <td style="padding-right: 12px; border: none;">-6.67<sup style="vertical-align: 4px;">***</sup></td>
+  </tr>
+  <tr>
+    <td style="padding-right: 12px; border: none;"></td>
+    <td style="padding-right: 12px; border: none;">(1.10)</td>
+    <td style="padding-right: 12px; border: none;">(4.46)</td>
+    <td style="padding-right: 12px; border: none;">(4.57)</td>
+    <td style="padding-right: 12px; border: none;">(1.82)</td>
+    <td style="padding-right: 12px; border: none;">(1.73)</td>
+  </tr>
+  <tr>
+    <td style="padding-right: 12px; border: none;">Cyclical ties</td>
+    <td style="padding-right: 12px; border: none;">-0.35<sup style="vertical-align: 4px;">***</sup></td>
+    <td style="padding-right: 12px; border: none;">-0.37<sup style="vertical-align: 4px;">***</sup></td>
+    <td style="padding-right: 12px; border: none;">-0.18</td>
+    <td style="padding-right: 12px; border: none;">-0.24</td>
+    <td style="padding-right: 12px; border: none;">-0.11</td>
+  </tr>
+  <tr>
+    <td style="padding-right: 12px; border: none;"></td>
+    <td style="padding-right: 12px; border: none;">(0.09)</td>
+    <td style="padding-right: 12px; border: none;">(0.09)</td>
+    <td style="padding-right: 12px; border: none;">(0.11)</td>
+    <td style="padding-right: 12px; border: none;">(0.16)</td>
+    <td style="padding-right: 12px; border: none;">(0.12)</td>
+  </tr>
+  <tr>
+    <td style="padding-right: 12px; border: none;">Transitive tries</td>
+    <td style="padding-right: 12px; border: none;">0.74</td>
+    <td style="padding-right: 12px; border: none;">1.33</td>
+    <td style="padding-right: 12px; border: none;">0.74<sup style="vertical-align: 4px;">*</sup></td>
+    <td style="padding-right: 12px; border: none;">-0.90</td>
+    <td style="padding-right: 12px; border: none;">0.00</td>
+  </tr>
+  <tr>
+    <td style="padding-right: 12px; border: none;"></td>
+    <td style="padding-right: 12px; border: none;">(0.54)</td>
+    <td style="padding-right: 12px; border: none;">(3.67)</td>
+    <td style="padding-right: 12px; border: none;">(0.43)</td>
+    <td style="padding-right: 12px; border: none;">(0.95)</td>
+    <td style="padding-right: 12px; border: none;">(0.46)</td>
+  </tr>
+  <tr>
+    <td style="padding-right: 12px; border: none;">Reciprocity</td>
+    <td style="padding-right: 12px; border: none;">0.35</td>
+    <td style="padding-right: 12px; border: none;">0.19</td>
+    <td style="padding-right: 12px; border: none;">0.16</td>
+    <td style="padding-right: 12px; border: none;">0.46<sup style="vertical-align: 4px;">*</sup></td>
+    <td style="padding-right: 12px; border: none;">0.41</td>
+  </tr>
+  <tr>
+    <td style="padding-right: 12px; border: none;"></td>
+    <td style="padding-right: 12px; border: none;">(0.31)</td>
+    <td style="padding-right: 12px; border: none;">(0.22)</td>
+    <td style="padding-right: 12px; border: none;">(0.52)</td>
+    <td style="padding-right: 12px; border: none;">(0.25)</td>
+    <td style="padding-right: 12px; border: none;">(0.30)</td>
+  </tr>
+  <tr>
+    <td style="padding-right: 12px; border: none;">Outdegree of ego</td>
+    <td style="padding-right: 12px; border: none;">0.22<sup style="vertical-align: 4px;">***</sup></td>
+    <td style="padding-right: 12px; border: none;">0.19<sup style="vertical-align: 4px;">***</sup></td>
+    <td style="padding-right: 12px; border: none;">0.27<sup style="vertical-align: 4px;">**</sup></td>
+    <td style="padding-right: 12px; border: none;">0.15<sup style="vertical-align: 4px;">***</sup></td>
+    <td style="padding-right: 12px; border: none;">0.25<sup style="vertical-align: 4px;">***</sup></td>
+  </tr>
+  <tr>
+    <td style="padding-right: 12px; border: none;"></td>
+    <td style="padding-right: 12px; border: none;">(0.03)</td>
+    <td style="padding-right: 12px; border: none;">(0.03)</td>
+    <td style="padding-right: 12px; border: none;">(0.12)</td>
+    <td style="padding-right: 12px; border: none;">(0.03)</td>
+    <td style="padding-right: 12px; border: none;">(0.05)</td>
+  </tr>
+  <tr>
+    <td style="padding-right: 12px; border: none;">Alter = decision-maker</td>
+    <td style="padding-right: 12px; border: none;">0.88<sup style="vertical-align: 4px;">***</sup></td>
+    <td style="padding-right: 12px; border: none;">0.79<sup style="vertical-align: 4px;">***</sup></td>
+    <td style="padding-right: 12px; border: none;">2.12<sup style="vertical-align: 4px;">***</sup></td>
+    <td style="padding-right: 12px; border: none;">0.72<sup style="vertical-align: 4px;">***</sup></td>
+    <td style="padding-right: 12px; border: none;">1.18<sup style="vertical-align: 4px;">***</sup></td>
+  </tr>
+  <tr>
+    <td style="padding-right: 12px; border: none;"></td>
+    <td style="padding-right: 12px; border: none;">(0.25)</td>
+    <td style="padding-right: 12px; border: none;">(0.23)</td>
+    <td style="padding-right: 12px; border: none;">(0.65)</td>
+    <td style="padding-right: 12px; border: none;">(0.27)</td>
+    <td style="padding-right: 12px; border: none;">(0.21)</td>
+  </tr>
+  <tr>
+    <td style="padding-right: 12px; border: none;">Committee memberships of alter</td>
+    <td style="padding-right: 12px; border: none;">0.36<sup style="vertical-align: 4px;">**</sup></td>
+    <td style="padding-right: 12px; border: none;">-0.61<sup style="vertical-align: 4px;">***</sup></td>
+    <td style="padding-right: 12px; border: none;">0.02</td>
+    <td style="padding-right: 12px; border: none;">0.27<sup style="vertical-align: 4px;">**</sup></td>
+    <td style="padding-right: 12px; border: none;">0.08<sup style="vertical-align: 4px;">**</sup></td>
+  </tr>
+  <tr>
+    <td style="padding-right: 12px; border: none;"></td>
+    <td style="padding-right: 12px; border: none;">(0.15)</td>
+    <td style="padding-right: 12px; border: none;">(0.18)</td>
+    <td style="padding-right: 12px; border: none;">(0.11)</td>
+    <td style="padding-right: 12px; border: none;">(0.14)</td>
+    <td style="padding-right: 12px; border: none;">(0.04)</td>
+  </tr>
+  <tr>
+    <td style="padding-right: 12px; border: none;">Indegree of alter</td>
+    <td style="padding-right: 12px; border: none;">0.30<sup style="vertical-align: 4px;">***</sup></td>
+    <td style="padding-right: 12px; border: none;">0.56<sup style="vertical-align: 4px;">***</sup></td>
+    <td style="padding-right: 12px; border: none;">1.32</td>
+    <td style="padding-right: 12px; border: none;">0.37<sup style="vertical-align: 4px;">***</sup></td>
+    <td style="padding-right: 12px; border: none;">0.59<sup style="vertical-align: 4px;">**</sup></td>
+  </tr>
+  <tr>
+    <td style="padding-right: 12px; border: none;"></td>
+    <td style="padding-right: 12px; border: none;">(0.05)</td>
+    <td style="padding-right: 12px; border: none;">(0.08)</td>
+    <td style="padding-right: 12px; border: none;">(0.87)</td>
+    <td style="padding-right: 12px; border: none;">(0.09)</td>
+    <td style="padding-right: 12px; border: none;">(0.28)</td>
+  </tr>
+  <tr>
+    <td style="padding-right: 12px; border: none;">Collaboration</td>
+    <td style="padding-right: 12px; border: none;">1.24<sup style="vertical-align: 4px;">***</sup></td>
+    <td style="padding-right: 12px; border: none;">1.30<sup style="vertical-align: 4px;">***</sup></td>
+    <td style="padding-right: 12px; border: none;">1.27<sup style="vertical-align: 4px;">***</sup></td>
+    <td style="padding-right: 12px; border: none;">1.75<sup style="vertical-align: 4px;">***</sup></td>
+    <td style="padding-right: 12px; border: none;">0.36<sup style="vertical-align: 4px;">*</sup></td>
+  </tr>
+  <tr>
+    <td style="padding-right: 12px; border: none;"></td>
+    <td style="padding-right: 12px; border: none;">(0.31)</td>
+    <td style="padding-right: 12px; border: none;">(0.21)</td>
+    <td style="padding-right: 12px; border: none;">(0.35)</td>
+    <td style="padding-right: 12px; border: none;">(0.25)</td>
+    <td style="padding-right: 12px; border: none;">(0.22)</td>
+  </tr>
+  <tr>
+    <td style="border-top: 1px solid black;">AIC</td>
+    <td style="border-top: 1px solid black;">854.35</td>
+    <td style="border-top: 1px solid black;">970.62</td>
+    <td style="border-top: 1px solid black;">545.46</td>
+    <td style="border-top: 1px solid black;">831.06</td>
+    <td style="border-top: 1px solid black;">742.65</td>
+  </tr>
+  <tr>
+    <td style="padding-right: 12px; border: none;">BIC</td>
+    <td style="padding-right: 12px; border: none;">899.56</td>
+    <td style="padding-right: 12px; border: none;">1015.83</td>
+    <td style="padding-right: 12px; border: none;">591.95</td>
+    <td style="padding-right: 12px; border: none;">873.77</td>
+    <td style="padding-right: 12px; border: none;">785.56</td>
+  </tr>
+  <tr>
+    <td style="border-bottom: 2px solid black;">Log Likelihood</td>
+    <td style="border-bottom: 2px solid black;">-418.18</td>
+    <td style="border-bottom: 2px solid black;">-476.31</td>
+    <td style="border-bottom: 2px solid black;">-263.73</td>
+    <td style="border-bottom: 2px solid black;">-406.53</td>
+    <td style="border-bottom: 2px solid black;">-362.32</td>
+  </tr>
+  <tr>
+    <td style="padding-right: 12px; border: none;" colspan="6"><span style="font-size:0.8em"><sup style="vertical-align: 4px;">***</sup>p &lt; 0.01, <sup style="vertical-align: 4px;">**</sup>p &lt; 0.05, <sup style="vertical-align: 4px;">*</sup>p &lt; 0.1</span></td>
+  </tr>
+</table>

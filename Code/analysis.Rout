@@ -1,0 +1,2379 @@
+
+R version 3.1.1 (2014-07-10) -- "Sock it to Me"
+Copyright (C) 2014 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R ist freie Software und kommt OHNE JEGLICHE GARANTIE.
+Sie sind eingeladen, es unter bestimmten Bedingungen weiter zu verbreiten.
+Tippen Sie 'license()' or 'licence()' für Details dazu.
+
+R ist ein Gemeinschaftsprojekt mit vielen Beitragenden.
+Tippen Sie 'contributors()' für mehr Information und 'citation()',
+um zu erfahren, wie R oder R packages in Publikationen zitiert werden können.
+
+Tippen Sie 'demo()' für einige Demos, 'help()' für on-line Hilfe, oder
+'help.start()' für eine HTML Browserschnittstelle zur Hilfe.
+Tippen Sie 'q()', um R zu verlassen.
+
+[Vorher gesicherter Workspace wiederhergestellt]
+
+> library("network")  # tested with version 1.10.2
+network: Classes for Relational Data
+Version 1.10.2 created on 2014-06-12.
+copyright (c) 2005, Carter T. Butts, University of California-Irvine
+                    Mark S. Handcock, University of California -- Los Angeles
+                    David R. Hunter, Penn State University
+                    Martina Morris, University of Washington
+                    Skye Bender-deMoll, University of Washington
+ For citation information, type citation("network").
+ Type help("network-package") to get started.
+
+> library("sna")      # tested with version 2.3.2
+sna: Tools for Social Network Analysis
+Version 2.3-2 created on 2014-01-13.
+copyright (c) 2005, Carter T. Butts, University of California-Irvine
+ For citation information, type citation("sna").
+ Type help(package="sna") to get started.
+
+
+Attache Paket: ‘sna’
+
+The following object is masked from ‘package:network’:
+
+    %c%
+
+> library("ergm")     # tested with version 3.1-0
+Lade nötiges Paket: statnet.common
+Lade nötiges Paket: robustbase
+Lade nötiges Paket: Matrix
+Lade nötiges Paket: trust
+Lade nötiges Paket: nlme
+
+Attache Paket: ‘nlme’
+
+The following object is masked from ‘package:sna’:
+
+    gapply
+
+Lade nötiges Paket: coda
+Lade nötiges Paket: lattice
+
+ergm: version 3.1-0, created on 2013-04-17
+Copyright (c) 2013, Mark S. Handcock, University of California -- Los Angeles
+                    David R. Hunter, Penn State University
+                    Carter T. Butts, University of California -- Irvine
+                    Steven M. Goodreau, University of Washington
+                    Pavel N. Krivitsky, Penn State University
+                    Martina Morris, University of Washington
+Based on "statnet" project software (statnet.org).
+For license and citation information see statnet.org/attribution
+or type citation("ergm").
+
+NOTE: If you use custom ERGM terms based on ‘ergm.userterms’ version
+prior to 3.1, you will need to perform a one-time update of the package
+boilerplate files (the files that you did not write or modify) from
+‘ergm.userterms’ 3.1 or later. See help('eut-upgrade') for
+instructions.
+
+NOTE: Dynamic network modeling functionality (STERGMs) has been moved
+to a new package, ‘tergm’.
+
+> library("tergm")    # tested with version 3.1-0
+Lade nötiges Paket: networkDynamic
+
+networkDynamic: version 0.6.3, created on 2014-02-27
+Copyright (c) 2014, Carter T. Butts, University of California -- Irvine
+                    Ayn Leslie-Cook, University of Washington
+                    Pavel N. Krivitsky, University of Wollongong
+                    Skye Bender-deMoll, University of Washington
+                    with contributions from
+                    Zack Almquist, University of California -- Irvine
+                    David R. Hunter, Penn State University
+                    Li Wang
+                    Kirk Li, University of Washington
+                    Steven M. Goodreau, University of Washington
+                    Martina Morris, University of Washington
+Based on "statnet" project software (statnet.org).
+For license and citation information see statnet.org/attribution
+or type citation("networkDynamic").
+
+
+tergm: version 3.1-0, created on 2013-04-26
+Copyright (c) 2013, Pavel N. Krivitsky, Penn State University
+                    Mark S. Handcock, University of California -- Los Angeles
+                    with contributions from
+                    David R. Hunter, Penn State University
+                    Steven M. Goodreau, University of Washington
+                    Martina Morris, University of Washington
+                    Nicole Bohme Carnegie, New York University
+                    Carter T. Butts, University of California -- Irvine
+                    Ayn Leslie-Cook, University of Washington
+Based on "statnet" project software (statnet.org).
+For license and citation information see statnet.org/attribution
+or type citation("tergm").
+
+> library("texreg")   # tested with version 1.33.2
+Version:  1.33.2
+Date:     2014-08-06
+Author:   Philip Leifeld (University of Konstanz)
+
+Please cite the JSS article in your publications -- see citation("texreg").
+> library("xergm")    # tested with version 1.1.3
+Package:  xergm
+Version:  1.1.3
+Date:     2014-09-22
+Authors:  Philip Leifeld (University of Konstanz)
+          Skyler J. Cranmer (University of North Carolina, Chapel Hill)
+          Bruce A. Desmarais (University of Massachusetts, Amherst)
+
+Attache Paket: ‘xergm’
+
+The following object is masked from ‘package:ergm’:
+
+    gof
+
+> 
+> 
+> # ==============================================================================
+> # Climate policy domain, time step 1, cross-sectional model
+> # ==============================================================================
+> 
+> # data preparation
+> clim1.rep <- read.csv2("input/climate9500-rep.csv", row.names = 1, 
++     header = TRUE)
+> clim1.rep <- network(as.matrix(clim1.rep))  # influence reputation network
+> clim1.collab <- read.csv2("input/climate9500-collab.csv", row.names = 1, 
++     header = TRUE)
+> clim1.collab <- network(as.matrix(clim1.collab))  # collaboration network
+> set.vertex.attribute(clim1.rep, "bc-perc", 100 * betweenness(clim1.collab, 
++     rescale = TRUE))  # betweenness centrality as a vertex attribute
+> clim1.dm <- read.csv2("input/climate9500-dm.csv", row.names = 1, header = TRUE)
+> set.vertex.attribute(clim1.rep, "dm", clim1.dm$dm)  # decision-maker?
+> set.vertex.attribute(clim1.rep, "odeg-rep", degree(clim1.rep, 
++     cmode = "outdegree"))  # outdegree centrality as a vertex attribute
+> com1 <- read.csv2("input/climate9500-committee.csv", row.names = 1, 
++     header = TRUE)
+> set.vertex.attribute(clim1.rep, "committees", rowSums(com1))
+>     # number of committee memberships as a vertex attribute
+> 
+> # save summary table for the appendix
+> clim1.names <- get.vertex.attribute(clim1.rep, "vertex.names")
+> clim1.bc <- 100 * betweenness(clim1.collab, rescale = TRUE)
+> clim1.committee <- rowSums(com1)
+> clim1.type <- read.csv2("input/climate9500-type.csv", row.names = 1, 
++     header = TRUE)
+> clim1.appendix <- data.frame(org = clim1.names, type3 = clim1.type[, 1], 
++     type5 = clim1.type[, 2], committees = clim1.committee, dm = clim1.dm$dm, 
++     betweenness = clim1.bc)
+> write.csv(clim1.appendix, file = "output/appendix-clim1.csv", row.names = FALSE)
+> 
+> # ERGM
+> set.seed(12345)
+> climate1 <- ergm(clim1.rep ~ 
++     edges + 
++     cyclicalties + 
++     transitiveties + 
++     mutual + 
++     nodeocov("odeg-rep") + 
++     edgecov(clim1.collab) + 
++     nodeicov("bc-perc") + 
++     nodeifactor("dm") + 
++     nodeicov("committees"), 
++     control = control.ergm(seed = 12345)
++ )  # ERGM (model 1)
+Iteration 1 of at most 20: 
+Convergence test P-value: 0e+00 
+The log-likelihood improved by 0.6827 
+Iteration 2 of at most 20: 
+Convergence test P-value: 3.9e-105 
+The log-likelihood improved by 0.1376 
+Iteration 3 of at most 20: 
+Convergence test P-value: 3.7e-17 
+The log-likelihood improved by 0.03362 
+Iteration 4 of at most 20: 
+Convergence test P-value: 3.2e-05 
+The log-likelihood improved by 0.01436 
+Iteration 5 of at most 20: 
+Convergence test P-value: 1.8e-04 
+The log-likelihood improved by 0.008284 
+Iteration 6 of at most 20: 
+Convergence test P-value: 8.3e-02 
+The log-likelihood improved by 0.003432 
+Iteration 7 of at most 20: 
+Convergence test P-value: 9.7e-02 
+The log-likelihood improved by 0.004857 
+Iteration 8 of at most 20: 
+Convergence test P-value: 2.4e-02 
+The log-likelihood improved by 0.008593 
+Iteration 9 of at most 20: 
+Convergence test P-value: 7.1e-01 
+Convergence detected. Stopping.
+The log-likelihood improved by 0.001651 
+
+This model was fit using MCMC.  To examine model diagnostics and check for degeneracy, use the mcmc.diagnostics() function.
+> summary(climate1)
+
+==========================
+Summary of model fit
+==========================
+
+Formula:   clim1.rep ~ edges + cyclicalties + transitiveties + mutual + 
+    nodeocov("odeg-rep") + edgecov(clim1.collab) + nodeicov("bc-perc") + 
+    nodeifactor("dm") + nodeicov("committees")
+
+Iterations:  20 
+
+Monte Carlo MLE Results:
+                     Estimate Std. Error MCMC %  p-value    
+edges                -4.47264    1.00369     85  < 1e-04 ***
+cyclicalties         -0.44985    0.08466      7  < 1e-04 ***
+transitiveties        0.91049    0.56933     68 0.110052    
+mutual                0.39637    0.28574      5 0.165675    
+nodeocov.odeg-rep     0.18771    0.02814     59  < 1e-04 ***
+edgecov.clim1.collab  1.64397    0.28388      3  < 1e-04 ***
+nodeicov.bc-perc      0.08129    0.01719     10  < 1e-04 ***
+nodeifactor.dm.1      0.90491    0.25848     34 0.000482 ***
+nodeicov.committees   0.57155    0.17669     36 0.001253 ** 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+     Null Deviance: 1555.4  on 1122  degrees of freedom
+ Residual Deviance:  895.2  on 1113  degrees of freedom
+ 
+AIC: 913.2    BIC: 958.4    (Smaller is better.) 
+> 
+> 
+> # ==============================================================================
+> # Climate policy domain, time step 2, cross-sectional model
+> # ==============================================================================
+> 
+> # data preparation
+> clim2.rep <- read.csv2("input/climate0205-rep.csv", row.names = 1, 
++     header = TRUE)
+> clim2.rep <- network(as.matrix(clim2.rep))  # influence reputation network
+> clim2.collab <- read.csv2("input/climate0205-collab.csv", row.names = 1, 
++     header = TRUE)
+> clim2.collab <- network(as.matrix(clim2.collab))  # collaboration network
+> set.vertex.attribute(clim2.rep, "bc-perc-2", 100 * betweenness(clim2.collab, 
++     rescale = TRUE))  # betweenness centrality as a vertex attribute
+> clim2.dm <- read.csv2("input/climate0205-dm.csv", row.names = 1, header = TRUE)
+> set.vertex.attribute(clim2.rep, "dm", clim2.dm$dm)  # decision-maker?
+> set.vertex.attribute(clim2.rep, "odeg-rep", degree(clim2.rep, 
++     cmode = "outdegree"))  # outdegree centrality as a vertex attribute
+> com2 <- read.csv2("input/climate0205-committee.csv", row.names = 1, 
++     header = TRUE)
+> set.vertex.attribute(clim2.rep, "committees-2", rowSums(com2))
+>     # number of committee memberships as a vertex attribute
+> 
+> # save summary table for the appendix
+> clim2.names <- get.vertex.attribute(clim2.rep, "vertex.names")
+> clim2.bc <- 100 * betweenness(clim2.collab, rescale = TRUE)
+> clim2.committee <- rowSums(com2)
+> clim2.type <- read.csv2("input/climate0205-type.csv", row.names = 1, 
++     header = TRUE)
+> clim2.appendix <- data.frame(org = clim2.names, type3 = clim2.type[, 1], 
++     type5 = clim2.type[, 2], committees = clim2.committee, dm = clim2.dm$dm, 
++     betweenness = clim2.bc)
+> write.csv(clim2.appendix, file = "output/appendix-clim2.csv", 
++     row.names = FALSE)
+> 
+> # ERGM
+> set.seed(12345)
+> climate2 <- ergm(clim2.rep ~ 
++     edges + 
++     cyclicalties + 
++     transitiveties + 
++     mutual + 
++     nodeocov("odeg-rep") + 
++     edgecov(clim2.collab) + 
++     nodeicov("bc-perc-2") + 
++     nodeifactor("dm") + 
++     nodeicov("committees-2"), 
++     control = control.ergm(seed = 12345)
++ )  # ERGM (model 2)
+Iteration 1 of at most 20: 
+Convergence test P-value: 0e+00 
+The log-likelihood improved by 2.966 
+Iteration 2 of at most 20: 
+Convergence test P-value: 7.8e-101 
+The log-likelihood improved by 0.1213 
+Iteration 3 of at most 20: 
+Convergence test P-value: 6.9e-12 
+The log-likelihood improved by 0.03012 
+Iteration 4 of at most 20: 
+Convergence test P-value: 1.5e-09 
+The log-likelihood improved by 0.02387 
+Iteration 5 of at most 20: 
+Convergence test P-value: 5.5e-03 
+The log-likelihood improved by 0.01317 
+Iteration 6 of at most 20: 
+Convergence test P-value: 1.1e-01 
+The log-likelihood improved by 0.008804 
+Iteration 7 of at most 20: 
+Convergence test P-value: 1.9e-01 
+The log-likelihood improved by 0.002186 
+Iteration 8 of at most 20: 
+Convergence test P-value: 2.2e-02 
+The log-likelihood improved by 0.01136 
+Iteration 9 of at most 20: 
+Convergence test P-value: 7.7e-01 
+Convergence detected. Stopping.
+The log-likelihood improved by 0.002536 
+
+This model was fit using MCMC.  To examine model diagnostics and check for degeneracy, use the mcmc.diagnostics() function.
+> summary(climate2)
+
+==========================
+Summary of model fit
+==========================
+
+Formula:   clim2.rep ~ edges + cyclicalties + transitiveties + mutual + 
+    nodeocov("odeg-rep") + edgecov(clim2.collab) + nodeicov("bc-perc-2") + 
+    nodeifactor("dm") + nodeicov("committees-2")
+
+Iterations:  20 
+
+Monte Carlo MLE Results:
+                      Estimate Std. Error MCMC %  p-value    
+edges                 -3.80660    5.24268     98 0.467943    
+cyclicalties          -0.52033    0.08768     33  < 1e-04 ***
+transitiveties         1.33004    4.77228     98 0.780525    
+mutual                -0.02104    0.23329     32 0.928152    
+nodeocov.odeg-rep      0.15299    0.02574     73  < 1e-04 ***
+edgecov.clim2.collab   1.79826    0.23342     20  < 1e-04 ***
+nodeicov.bc-perc-2     0.13326    0.02159     41  < 1e-04 ***
+nodeifactor.dm.1       0.75681    0.22333     25 0.000727 ***
+nodeicov.committees-2 -0.44051    0.17360     13 0.011302 *  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+     Null Deviance: 1555  on 1122  degrees of freedom
+ Residual Deviance: 1064  on 1113  degrees of freedom
+ 
+AIC: 1082    BIC: 1127    (Smaller is better.) 
+> 
+> 
+> # ==============================================================================
+> # Telecommunications policy domain
+> # ==============================================================================
+> 
+> # data preparation
+> telecom.rep <- read.csv2("input/telecom-rep.csv", row.names = 1, header = TRUE)
+> telecom.rep <- network(as.matrix(telecom.rep))  # influence reputation network
+> telecom.collab <- read.csv2("input/telecom-collab.csv", row.names = 1, 
++     header = TRUE)
+> for (i in 1:nrow(telecom.collab)) {
++   for (j in 1:ncol(telecom.collab)) {
++     if (is.na(telecom.collab[i, j])) {
++       telecom.collab[i, j] <- telecom.collab[j, i]
++     }
++     if (is.na(telecom.collab[i, j])) {  # i.e., both ij and ji are missing
++       telecom.collab[i, j] <- 0
++     }
++   }
++ }
+> telecom.collab <- network(telecom.collab)  # collaboration network
+> set.vertex.attribute(telecom.rep, "bc-perc", 100 * betweenness(telecom.collab, 
++     rescale = TRUE))  # betweenness centrality as a vertex attribute
+> telecom.dm <- read.csv2("input/telecom-dm.csv", row.names = 1, header = TRUE)
+> set.vertex.attribute(telecom.rep, "dm", telecom.dm$dm)  # decision-maker?
+> set.vertex.attribute(telecom.rep, "odeg-rep", degree(telecom.rep, 
++     cmode = "outdegree"))  # outdegree centrality as a vertex attribute
+> telecom.committee <- rowSums(read.csv2("input/telecom-committee.csv", 
++     row.names = 1, header = TRUE))
+> set.vertex.attribute(telecom.rep, "committees", telecom.committee)
+>     # number of committee memberships as a vertex attribute
+> 
+> # save summary table for the appendix
+> telecom.names <- get.vertex.attribute(telecom.rep, "vertex.names")
+> telecom.bc <- 100 * betweenness(telecom.collab, rescale = TRUE)
+> telecom.type <- read.csv2("input/telecom-type.csv", row.names = 1, 
++     header = TRUE)
+> telecom.appendix <- data.frame(org = telecom.names, type3 = telecom.type[, 1], 
++     type5 = telecom.type[, 2], committees = telecom.committee, 
++     dm = telecom.dm$dm, betweenness = telecom.bc)
+> write.csv(telecom.appendix, file = "output/appendix-telecom.csv", 
++     row.names = FALSE)
+> 
+> # ERGM
+> set.seed(12345)
+> telecom <- ergm(telecom.rep ~ 
++     edges + 
++     cyclicalties + 
++     transitiveties + 
++     mutual + 
++     nodeocov("odeg-rep") + 
++     edgecov(telecom.collab) + 
++     nodeicov("bc-perc") + 
++     nodeifactor("dm") + 
++     nodeicov("committees"), 
++     control = control.ergm(seed = 12345)
++ )  # ERGM (model 3)
+Iteration 1 of at most 20: 
+Convergence test P-value: 0e+00 
+The log-likelihood improved by 0.8967 
+Iteration 2 of at most 20: 
+Convergence test P-value: 1.1e-37 
+The log-likelihood improved by 0.0904 
+Iteration 3 of at most 20: 
+Convergence test P-value: 3.6e-10 
+The log-likelihood improved by 0.02795 
+Iteration 4 of at most 20: 
+Convergence test P-value: 3.5e-03 
+The log-likelihood improved by 0.008914 
+Iteration 5 of at most 20: 
+Convergence test P-value: 4.9e-01 
+The log-likelihood improved by 0.003477 
+Iteration 6 of at most 20: 
+Convergence test P-value: 4.9e-01 
+The log-likelihood improved by 0.00319 
+Iteration 7 of at most 20: 
+Convergence test P-value: 3.2e-01 
+The log-likelihood improved by 0.003847 
+Iteration 8 of at most 20: 
+Convergence test P-value: 2.3e-01 
+The log-likelihood improved by 0.005819 
+Iteration 9 of at most 20: 
+Convergence test P-value: 4e-01 
+The log-likelihood improved by 0.003787 
+Iteration 10 of at most 20: 
+Convergence test P-value: 6.6e-02 
+The log-likelihood improved by 0.007118 
+Iteration 11 of at most 20: 
+Convergence test P-value: 3.9e-01 
+The log-likelihood improved by 0.003964 
+Iteration 12 of at most 20: 
+Convergence test P-value: 1.6e-01 
+The log-likelihood improved by 0.004441 
+Iteration 13 of at most 20: 
+Convergence test P-value: 1.2e-01 
+The log-likelihood improved by 0.005589 
+Iteration 14 of at most 20: 
+Convergence test P-value: 3.1e-02 
+The log-likelihood improved by 0.007487 
+Iteration 15 of at most 20: 
+Convergence test P-value: 8e-01 
+Convergence detected. Stopping.
+The log-likelihood improved by 0.002086 
+
+This model was fit using MCMC.  To examine model diagnostics and check for degeneracy, use the mcmc.diagnostics() function.
+> summary(telecom)
+
+==========================
+Summary of model fit
+==========================
+
+Formula:   telecom.rep ~ edges + cyclicalties + transitiveties + mutual + 
+    nodeocov("odeg-rep") + edgecov(telecom.collab) + nodeicov("bc-perc") + 
+    nodeifactor("dm") + nodeicov("committees")
+
+Iterations:  20 
+
+Monte Carlo MLE Results:
+                       Estimate Std. Error MCMC %  p-value    
+edges                  -6.74491    1.67772     92  < 1e-04 ***
+cyclicalties           -0.21621    0.10543     14 0.040491 *  
+transitiveties          1.17777    0.60027     73 0.049972 *  
+mutual                  0.21279    0.52725     25 0.686585    
+nodeocov.odeg-rep       0.18835    0.04837     78 0.000104 ***
+edgecov.telecom.collab  1.84719    0.42927     64  < 1e-04 ***
+nodeicov.bc-perc        0.09904    0.04480     45 0.027230 *  
+nodeifactor.dm.1        2.05552    0.52670     75 0.000100 ***
+nodeicov.committees     0.20936    0.07847     41 0.007725 ** 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+     Null Deviance: 1795.3  on 1295  degrees of freedom
+ Residual Deviance:  624.1  on 1286  degrees of freedom
+ 
+AIC: 642.1    BIC: 688.6    (Smaller is better.) 
+> 
+> 
+> # ==============================================================================
+> # PM Visp
+> # ==============================================================================
+> 
+> # data preparation
+> pmvisp.rep <- read.csv2("input/pmvisp-rep.csv", row.names = 1, header = TRUE)
+> pmvisp.rep <- network(as.matrix(pmvisp.rep))  # influence reputation network
+> pmvisp.collab <- read.csv2("input/pmvisp-collab.csv", row.names = 1, 
++     header = TRUE)
+> for (i in 1:nrow(pmvisp.collab)) {
++   for (j in 1:ncol(pmvisp.collab)) {
++     if (is.na(pmvisp.collab[i, j])) {
++       pmvisp.collab[i, j] <- pmvisp.collab[j, i]
++     }
++     if (is.na(pmvisp.collab[i, j])) {
++       pmvisp.collab[i, j] <- 0
++     }
++   }
++ }
+> pmvisp.collab <- network(pmvisp.collab)  # collaboration network
+> set.vertex.attribute(pmvisp.rep, "bc-perc", 100 * betweenness(pmvisp.collab, 
++     rescale = TRUE))  # betweenness centrality as a vertex attribute
+> pmvisp.dm <- read.csv2("input/pmvisp-dm.csv", row.names = 1, header = TRUE)
+> set.vertex.attribute(pmvisp.rep, "dm", pmvisp.dm$dm)  # decision-maker?
+> set.vertex.attribute(pmvisp.rep, "odeg-rep", degree(pmvisp.rep, 
++     cmode = "outdegree"))  # outdegree centrality as a vertex attribute
+> pmvisp.committee <- rowSums(read.csv2("input/pmvisp-committee.csv", 
++     row.names = 1, header = TRUE))
+> set.vertex.attribute(pmvisp.rep, "committees", pmvisp.committee)
+>     # number of committee memberships as a vertex attribute
+> 
+> # save summary table for the appendix
+> pmvisp.names <- get.vertex.attribute(pmvisp.rep, "vertex.names")
+> pmvisp.bc <- 100 * betweenness(pmvisp.collab, rescale = TRUE)
+> pmvisp.type <- read.csv2("input/pmvisp-type.csv", row.names = 1, header = TRUE)
+> pmvisp.appendix <- data.frame(org = pmvisp.names, type3 = pmvisp.type[, 1], 
++     type5 = pmvisp.type[, 2], committees = pmvisp.committee, 
++     dm = pmvisp.dm$dm, betweenness = pmvisp.bc)
+> write.csv(pmvisp.appendix, file = "output/appendix-pmvisp.csv", 
++     row.names = FALSE)
+> 
+> # ERGM
+> set.seed(12345)
+> pmvisp <- ergm(pmvisp.rep ~ 
++     edges + 
++     cyclicalties + 
++     transitiveties + 
++     mutual + 
++     nodeocov("odeg-rep") + 
++     edgecov(pmvisp.collab) + 
++     nodeicov("bc-perc") + 
++     nodeifactor("dm") + 
++     nodeicov("committees"), 
++     control = control.ergm(seed = 12345)
++ )  # ERGM (model 4)
+Iteration 1 of at most 20: 
+Convergence test P-value: 0e+00 
+The log-likelihood improved by 4.021 
+Iteration 2 of at most 20: 
+Convergence test P-value: 6.9e-216 
+The log-likelihood improved by 0.6801 
+Iteration 3 of at most 20: 
+Convergence test P-value: 2.4e-31 
+The log-likelihood improved by 0.1403 
+Iteration 4 of at most 20: 
+Convergence test P-value: 2.9e-07 
+The log-likelihood improved by 0.03441 
+Iteration 5 of at most 20: 
+Convergence test P-value: 7.5e-07 
+The log-likelihood improved by 0.03726 
+Iteration 6 of at most 20: 
+Convergence test P-value: 4.2e-01 
+The log-likelihood improved by 0.009233 
+Iteration 7 of at most 20: 
+Convergence test P-value: 6e-01 
+Convergence detected. Stopping.
+The log-likelihood improved by 0.004792 
+
+This model was fit using MCMC.  To examine model diagnostics and check for degeneracy, use the mcmc.diagnostics() function.
+> summary(pmvisp)
+
+==========================
+Summary of model fit
+==========================
+
+Formula:   pmvisp.rep ~ edges + cyclicalties + transitiveties + mutual + 
+    nodeocov("odeg-rep") + edgecov(pmvisp.collab) + nodeicov("bc-perc") + 
+    nodeifactor("dm") + nodeicov("committees")
+
+Iterations:  20 
+
+Monte Carlo MLE Results:
+                        Estimate Std. Error MCMC % p-value    
+edges                 -2.6016922  1.6285706     94 0.11052    
+cyclicalties           0.0002502  0.2893998     53 0.99931    
+transitiveties        -1.3682987  0.7897707     82 0.08355 .  
+mutual                 0.6386556  0.2542567      6 0.01220 *  
+nodeocov.odeg-rep      0.1471842  0.0238020     74 < 1e-04 ***
+edgecov.pmvisp.collab  1.9466501  0.2731672     10 < 1e-04 ***
+nodeicov.bc-perc       0.0929466  0.0321214     35 0.00391 ** 
+nodeifactor.dm.1       0.8006665  0.2452764      4 0.00114 ** 
+nodeicov.committees    0.3204971  0.1408620     63 0.02314 *  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+     Null Deviance: 1179.7  on 851  degrees of freedom
+ Residual Deviance:  841.5  on 842  degrees of freedom
+ 
+AIC: 859.5    BIC: 902.3    (Smaller is better.) 
+> 
+> 
+> # ==============================================================================
+> # Toxic chemicals policy domain in Germany
+> # ==============================================================================
+> 
+> # data preparation
+> chem.rep <- read.csv2("input/chem-rep.csv", row.names = 1, header = TRUE)
+> chem.rep <- network(as.matrix(chem.rep))  # influence reputation network
+> chem.collab <- read.csv2("input/chem-collab.csv", row.names = 1, header = TRUE)
+> chem.collab[is.na(chem.collab)] <- 0
+> chem.collab <- as.matrix(symmetrize(chem.collab))
+> chem.collab <- network(chem.collab)  # collaboration network
+> set.vertex.attribute(chem.rep, "bc-perc", 100 * betweenness(chem.collab, 
++     rescale = TRUE))  # betweenness centrality as a vertex attribute
+> chem.dm <- read.csv2("input/chem-dm.csv", row.names = 1, header = TRUE)
+> set.vertex.attribute(chem.rep, "dm", chem.dm$dm)  # decision-maker?
+> set.vertex.attribute(chem.rep, "odeg-rep", degree(chem.rep, 
++     cmode = "outdegree"))  # outdegree centrality as a vertex attribute
+> chem.committee <- read.csv2("input/chem-committee.csv", row.names = 1, 
++     header = TRUE)
+> set.vertex.attribute(chem.rep, "committees", colSums(chem.committee))
+>     # number of committee memberships as a vertex attribute
+> 
+> # save summary table for the appendix
+> chem.names <- get.vertex.attribute(chem.rep, "vertex.names")
+> chem.bc <- 100 * betweenness(chem.collab, rescale = TRUE)
+> chem.type <- read.csv2("input/chem-type.csv", row.names = 1, header = TRUE)
+> chem.appendix <- data.frame(org = chem.names, type = chem.type[, 1], 
++     committees = colSums(chem.committee), dm = chem.dm$dm, 
++     betweenness = chem.bc)
+> write.csv(chem.appendix, file = "output/appendix-chem.csv", row.names = FALSE)
+> 
+> # ERGM
+> set.seed(12345)
+> chem <- ergm(chem.rep ~ 
++     edges + 
++     cyclicalties + 
++     transitiveties + 
++     mutual + 
++     nodeocov("odeg-rep") + 
++     edgecov(chem.collab) + 
++     nodeicov("bc-perc") + 
++     nodeifactor("dm") + 
++     nodeicov("committees"), 
++     control = control.ergm(seed = 12345)
++ )  # ERGM (model 5)
+Iteration 1 of at most 20: 
+Convergence test P-value: 2.4e-294 
+The log-likelihood improved by 0.2689 
+Iteration 2 of at most 20: 
+Convergence test P-value: 4.4e-72 
+The log-likelihood improved by 0.05982 
+Iteration 3 of at most 20: 
+Convergence test P-value: 1.8e-20 
+The log-likelihood improved by 0.02053 
+Iteration 4 of at most 20: 
+Convergence test P-value: 8.3e-07 
+The log-likelihood improved by 0.008962 
+Iteration 5 of at most 20: 
+Convergence test P-value: 1.3e-03 
+The log-likelihood improved by 0.006095 
+Iteration 6 of at most 20: 
+Convergence test P-value: 2.8e-02 
+The log-likelihood improved by 0.004148 
+Iteration 7 of at most 20: 
+Convergence test P-value: 4.7e-01 
+The log-likelihood improved by 0.001492 
+Iteration 8 of at most 20: 
+Convergence test P-value: 9e-01 
+Convergence detected. Stopping.
+The log-likelihood improved by 0.0009627 
+
+This model was fit using MCMC.  To examine model diagnostics and check for degeneracy, use the mcmc.diagnostics() function.
+> summary(chem)
+
+==========================
+Summary of model fit
+==========================
+
+Formula:   chem.rep ~ edges + cyclicalties + transitiveties + mutual + nodeocov("odeg-rep") + 
+    edgecov(chem.collab) + nodeicov("bc-perc") + nodeifactor("dm") + 
+    nodeicov("committees")
+
+Iterations:  20 
+
+Monte Carlo MLE Results:
+                    Estimate Std. Error MCMC %  p-value    
+edges               -5.48465    1.26176     84  < 1e-04 ***
+cyclicalties        -0.16217    0.09963     21 0.103931    
+transitiveties       0.10639    0.49171     53 0.828760    
+mutual               0.42503    0.29877      8 0.155209    
+nodeocov.odeg-rep    0.25443    0.05312     74  < 1e-04 ***
+edgecov.chem.collab  0.45771    0.22481      5 0.042061 *  
+nodeicov.bc-perc     0.11456    0.02921      0  < 1e-04 ***
+nodeifactor.dm.1     1.49850    0.27926     45  < 1e-04 ***
+nodeicov.committees  0.12475    0.03512     38 0.000403 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+     Null Deviance: 1206.1  on 870  degrees of freedom
+ Residual Deviance:  722.6  on 861  degrees of freedom
+ 
+AIC: 740.6    BIC: 783.6    (Smaller is better.) 
+> 
+> 
+> # ==============================================================================
+> # Create table with ERGM results
+> # ==============================================================================
+> 
+> htmlreg(list(climate1, climate2, telecom, pmvisp, chem), 
++     file = "output/table-ergm.doc", custom.model.names = c("Climate 95-00", 
++     "Climate 02-05", "Telecom", "PM Visp", "Chemicals"), 
++     custom.coef.names = c("Edges", "Cyclical ties", "Transitive tries", 
++     "Reciprocity", "Outdegree of ego", "Collaboration", "Betweenness of alter", 
++     "Alter = decision-maker", "Committee memberships of alter", 
++     "Collaboration", "Betweenness of alter", "Committee memberships of alter", 
++     "Collaboration", "Collaboration", "Collaboration"), 
++     reorder.coef = c(1:5, 8:9, 7, 6), stars = c(0.01, 0.05, 0.1))
+The table was written to the file 'output/table-ergm.doc'.
+
+> 
+> 
+> # ==============================================================================
+> # Climate policy domain, TERGM + GOF
+> # ==============================================================================
+> 
+> set.vertex.attribute(clim2.rep, "bc-perc-1", 100 * betweenness(clim1.collab, 
++     rescale = TRUE)) # add betweenness from previous time step as node attribute
+> bc <- betweenness(clim2.rep, rescale = FALSE) - betweenness(clim1.rep, 
++     rescale = FALSE)  # change in betweenness from t1 to t2
+> bc <- 100 * bc / sum(abs(bc))  # compute percentages
+> set.vertex.attribute(clim2.rep, "bc-change", bc)
+> set.vertex.attribute(clim2.rep, "odeg-rep-1", degree(clim1.rep, 
++     cmode = "outdegree"))  # add outdegree from previous time step
+> deg.change <- degree(clim2.rep, cmode = "outdegree") - degree(clim1.rep, 
++     cmode = "outdegree")
+> set.vertex.attribute(clim2.rep, "odeg-change", deg.change)
+>     # outdegree change between t1 and t2
+> c1 <- as.matrix(clim1.collab)
+> c2 <- as.matrix(clim2.collab)
+> collab.delta <- c2 - c1  # positive or negative change in collaboration t1 to t2
+> set.vertex.attribute(clim2.rep, "committees-1", rowSums(com1)) # committees t=1
+> set.vertex.attribute(clim1.rep, "committees-2", rowSums(com2)) # committees t=2
+> 
+> set.seed(12345)
+> climate.tergm <- ergm(clim2.rep ~ 
++     edges + 
++     cyclicalties + 
++     transitiveties + 
++     mutual + 
++     nodeocov("odeg-rep-1") + 
++     nodeocov("odeg-change") + 
++     edgecov(clim1.collab) + 
++     edgecov(collab.delta) + 
++     nodeicov("bc-perc-1") + 
++     nodeicov("bc-change") + 
++     nodeifactor("dm") + 
++     edgecov(clim1.rep) + 
++     nodeicov("committees-1"), 
++     control = control.ergm(seed = 12345)
++ )
+Iteration 1 of at most 20: 
+Convergence test P-value: 0e+00 
+The log-likelihood improved by 1.764 
+Iteration 2 of at most 20: 
+Convergence test P-value: 3.2e-97 
+The log-likelihood improved by 0.1813 
+Iteration 3 of at most 20: 
+Convergence test P-value: 5.6e-29 
+The log-likelihood improved by 0.0653 
+Iteration 4 of at most 20: 
+Convergence test P-value: 4.7e-05 
+The log-likelihood improved by 0.01377 
+Iteration 5 of at most 20: 
+Convergence test P-value: 5e-03 
+The log-likelihood improved by 0.01181 
+Iteration 6 of at most 20: 
+Convergence test P-value: 1.6e-01 
+The log-likelihood improved by 0.006351 
+Iteration 7 of at most 20: 
+Convergence test P-value: 4.2e-01 
+The log-likelihood improved by 0.004704 
+Iteration 8 of at most 20: 
+Convergence test P-value: 3.5e-02 
+The log-likelihood improved by 0.008228 
+Iteration 9 of at most 20: 
+Convergence test P-value: 8.1e-02 
+The log-likelihood improved by 0.008819 
+Iteration 10 of at most 20: 
+Convergence test P-value: 3.2e-01 
+The log-likelihood improved by 0.005651 
+Iteration 11 of at most 20: 
+Convergence test P-value: 1.7e-02 
+The log-likelihood improved by 0.01504 
+Iteration 12 of at most 20: 
+Convergence test P-value: 8.6e-01 
+Convergence detected. Stopping.
+The log-likelihood improved by 0.002957 
+
+This model was fit using MCMC.  To examine model diagnostics and check for degeneracy, use the mcmc.diagnostics() function.
+> summary(climate.tergm)
+
+==========================
+Summary of model fit
+==========================
+
+Formula:   clim2.rep ~ edges + cyclicalties + transitiveties + mutual + 
+    nodeocov("odeg-rep-1") + nodeocov("odeg-change") + edgecov(clim1.collab) + 
+    edgecov(collab.delta) + nodeicov("bc-perc-1") + nodeicov("bc-change") + 
+    nodeifactor("dm") + edgecov(clim1.rep) + nodeicov("committees-1")
+
+Iterations:  20 
+
+Monte Carlo MLE Results:
+                       Estimate Std. Error MCMC %  p-value    
+edges                 -4.082724   3.929139     96 0.298990    
+cyclicalties          -0.530907   0.094502     36  < 1e-04 ***
+transitiveties         1.374268   3.455641     96 0.690937    
+mutual                 0.132446   0.262783     34 0.614354    
+nodeocov.odeg-rep-1    0.106169   0.030871     65 0.000605 ***
+nodeocov.odeg-change   0.156534   0.024116     61  < 1e-04 ***
+edgecov.clim1.collab   1.583694   0.345480      5  < 1e-04 ***
+edgecov.collab.delta   1.579428   0.252760     12  < 1e-04 ***
+nodeicov.bc-perc-1     0.082917   0.018022     20  < 1e-04 ***
+nodeicov.bc-change     0.034804   0.016972     15 0.040539 *  
+nodeifactor.dm.1       0.643914   0.245265     29 0.008774 ** 
+edgecov.clim1.rep      1.788237   0.201111      3  < 1e-04 ***
+nodeicov.committees-1 -0.001874   0.124718      5 0.988016    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+     Null Deviance: 1555.4  on 1122  degrees of freedom
+ Residual Deviance:  998.1  on 1109  degrees of freedom
+ 
+AIC: 1024    BIC: 1089    (Smaller is better.) 
+> 
+> # MCMC diagnostics
+> pdf("output/diagnostics-climate-tergm.pdf")
+> set.seed(12345)
+> mcmc.diagnostics(climate.tergm)
+Sample statistics summary:
+
+Iterations = 10000:1009900
+Thinning interval = 100 
+Number of chains = 1 
+Sample size per chain = 10000 
+
+1. Empirical mean and standard deviation for each variable,
+   plus standard error of the mean:
+
+                         Mean      SD Naive SE Time-series SE
+edges                 -0.6315  13.961  0.13961         0.7175
+cyclicalties          -0.3647  26.950  0.26950         2.1361
+transitiveties        -0.6501  14.476  0.14476         0.7526
+mutual                -0.1948   8.910  0.08910         0.5366
+nodeocov.odeg-rep-1   -7.3190 150.800  1.50800         7.5411
+nodeocov.odeg-change  -2.2968 120.512  1.20512         6.5069
+edgecov.clim1.collab  -0.0078   3.699  0.03699         0.2261
+edgecov.collab.delta  -0.3196   4.683  0.04683         0.2549
+nodeicov.bc-perc-1    -2.5604  78.706  0.78706         4.8468
+nodeicov.bc-change    -3.4017  70.380  0.70380         3.8382
+nodeifactor.dm.1      -0.2829   5.919  0.05919         0.2900
+edgecov.clim1.rep     -0.6983   7.307  0.07307         0.4149
+nodeicov.committees-1  0.0164  12.366  0.12366         0.7624
+
+2. Quantiles for each variable:
+
+                        2.5%     25%    50%   75% 97.5%
+edges                  -28.0  -10.00 -1.000  9.00  27.0
+cyclicalties           -59.0  -17.00  2.000 18.00  48.0
+transitiveties         -29.0  -10.00 -1.000  9.00  28.0
+mutual                 -18.0   -6.00  0.000  6.00  17.0
+nodeocov.odeg-rep-1   -300.0 -109.00 -7.000 96.00 284.0
+nodeocov.odeg-change  -237.0  -83.00 -3.000 79.00 231.0
+edgecov.clim1.collab    -7.0   -3.00  0.000  2.00   7.0
+edgecov.collab.delta   -10.0   -3.00  0.000  3.00   9.0
+nodeicov.bc-perc-1    -160.9  -54.58 -0.901 51.05 150.6
+nodeicov.bc-change    -136.9  -51.42 -4.751 45.07 132.7
+nodeifactor.dm.1       -12.0   -4.00  0.000  4.00  11.0
+edgecov.clim1.rep      -15.0   -6.00 -1.000  4.00  14.0
+nodeicov.committees-1  -24.0   -8.00  0.000  8.00  24.0
+
+
+Are sample statistics significantly different from observed?
+                edges cyclicalties transitiveties     mutual
+diff.      -0.6315000   -0.3647000     -0.6501000 -0.1948000
+test stat. -0.8801225   -0.1707339     -0.8638378 -0.3630066
+P-val.      0.3787929    0.8644330      0.3876770  0.7166000
+           nodeocov.odeg-rep-1 nodeocov.odeg-change edgecov.clim1.collab
+diff.               -7.3190000           -2.2968000          -0.00780000
+test stat.          -0.9705473           -0.3529798          -0.03449828
+P-val.               0.3317738            0.7241036           0.97247982
+           edgecov.collab.delta nodeicov.bc-perc-1 nodeicov.bc-change
+diff.                -0.3196000         -2.5603520         -3.4016596
+test stat.           -1.2540351         -0.5282520         -0.8862693
+P-val.                0.2098292          0.5973245          0.3754724
+           nodeifactor.dm.1 edgecov.clim1.rep nodeicov.committees-1
+diff.            -0.2829000       -0.69830000            0.01640000
+test stat.       -0.9756327       -1.68320685            0.02151079
+P-val.            0.3292465        0.09233506            0.98283820
+           Overall (Chi^2)
+diff.                   NA
+test stat.       7.7596360
+P-val.           0.8588992
+
+Sample statistics cross-correlations:
+                           edges cyclicalties transitiveties    mutual
+edges                 1.00000000    0.7716057     0.99504860 0.7588389
+cyclicalties          0.77160567    1.0000000     0.77855881 0.8057162
+transitiveties        0.99504860    0.7785588     1.00000000 0.7637401
+mutual                0.75883894    0.8057162     0.76374007 1.0000000
+nodeocov.odeg-rep-1   0.82418934    0.5482956     0.81993198 0.6100385
+nodeocov.odeg-change  0.52185688    0.3409777     0.51821377 0.3217306
+edgecov.clim1.collab  0.35747483    0.4166851     0.35893289 0.3994423
+edgecov.collab.delta  0.26308870    0.2105802     0.26036470 0.2086381
+nodeicov.bc-perc-1    0.40128300    0.3641619     0.39939528 0.3123432
+nodeicov.bc-change    0.07182522    0.1747045     0.08230278 0.2367440
+nodeifactor.dm.1      0.45860418    0.3529835     0.45394590 0.3993855
+edgecov.clim1.rep     0.57662763    0.4305404     0.57381035 0.4715239
+nodeicov.committees-1 0.65175438    0.5150551     0.64877607 0.4731582
+                      nodeocov.odeg-rep-1 nodeocov.odeg-change
+edges                           0.8241893           0.52185688
+cyclicalties                    0.5482956           0.34097773
+transitiveties                  0.8199320           0.51821377
+mutual                          0.6100385           0.32173062
+nodeocov.odeg-rep-1             1.0000000           0.12635084
+nodeocov.odeg-change            0.1263508           1.00000000
+edgecov.clim1.collab            0.2738205           0.00543780
+edgecov.collab.delta            0.1257607           0.23370519
+nodeicov.bc-perc-1              0.2513260           0.11525909
+nodeicov.bc-change              0.1032794          -0.10167231
+nodeifactor.dm.1                0.4117399           0.11268914
+edgecov.clim1.rep               0.6654739          -0.02271615
+nodeicov.committees-1           0.4976926           0.35575575
+                      edgecov.clim1.collab edgecov.collab.delta
+edges                          0.357474832           0.26308870
+cyclicalties                   0.416685108           0.21058015
+transitiveties                 0.358932894           0.26036470
+mutual                         0.399442272           0.20863808
+nodeocov.odeg-rep-1            0.273820514           0.12576067
+nodeocov.odeg-change           0.005437800           0.23370519
+edgecov.clim1.collab           1.000000000          -0.14009632
+edgecov.collab.delta          -0.140096323           1.00000000
+nodeicov.bc-perc-1             0.344133123           0.12060422
+nodeicov.bc-change             0.002998279           0.01436974
+nodeifactor.dm.1               0.205469151           0.03113867
+edgecov.clim1.rep              0.363964579           0.05287327
+nodeicov.committees-1          0.343374933           0.20975225
+                      nodeicov.bc-perc-1 nodeicov.bc-change nodeifactor.dm.1
+edges                         0.40128300        0.071825216       0.45860418
+cyclicalties                  0.36416190        0.174704505       0.35298347
+transitiveties                0.39939528        0.082302782       0.45394590
+mutual                        0.31234321        0.236744031       0.39938554
+nodeocov.odeg-rep-1           0.25132605        0.103279394       0.41173992
+nodeocov.odeg-change          0.11525909       -0.101672310       0.11268914
+edgecov.clim1.collab          0.34413312        0.002998279       0.20546915
+edgecov.collab.delta          0.12060422        0.014369736       0.03113867
+nodeicov.bc-perc-1            1.00000000       -0.051006192       0.06974154
+nodeicov.bc-change           -0.05100619        1.000000000       0.21966189
+nodeifactor.dm.1              0.06974154        0.219661885       1.00000000
+edgecov.clim1.rep             0.30680800        0.029616607       0.35598165
+nodeicov.committees-1         0.52968671       -0.106215257       0.12645282
+                      edgecov.clim1.rep nodeicov.committees-1
+edges                        0.57662763             0.6517544
+cyclicalties                 0.43054043             0.5150551
+transitiveties               0.57381035             0.6487761
+mutual                       0.47152395             0.4731582
+nodeocov.odeg-rep-1          0.66547394             0.4976926
+nodeocov.odeg-change        -0.02271615             0.3557557
+edgecov.clim1.collab         0.36396458             0.3433749
+edgecov.collab.delta         0.05287327             0.2097522
+nodeicov.bc-perc-1           0.30680800             0.5296867
+nodeicov.bc-change           0.02961661            -0.1062153
+nodeifactor.dm.1             0.35598165             0.1264528
+edgecov.clim1.rep            1.00000000             0.4343479
+nodeicov.committees-1        0.43434788             1.0000000
+
+Sample statistics auto-correlation:
+Chain 1 
+            edges cyclicalties transitiveties    mutual nodeocov.odeg-rep-1
+Lag 0   1.0000000    1.0000000      1.0000000 1.0000000           1.0000000
+Lag 100 0.9125391    0.9579268      0.9116432 0.9246082           0.9109922
+Lag 200 0.8356534    0.9203691      0.8350245 0.8598220           0.8315093
+Lag 300 0.7702741    0.8867079      0.7707722 0.8039240           0.7623812
+Lag 400 0.7115625    0.8567333      0.7130620 0.7560735           0.7000779
+Lag 500 0.6630156    0.8319000      0.6661318 0.7165354           0.6470418
+        nodeocov.odeg-change edgecov.clim1.collab edgecov.collab.delta
+Lag 0              1.0000000            1.0000000            1.0000000
+Lag 100            0.9225183            0.9369273            0.9259905
+Lag 200            0.8540555            0.8802154            0.8623435
+Lag 300            0.7927188            0.8295352            0.8047401
+Lag 400            0.7369271            0.7849231            0.7533091
+Lag 500            0.6883170            0.7461308            0.7051119
+        nodeicov.bc-perc-1 nodeicov.bc-change nodeifactor.dm.1
+Lag 0            1.0000000          1.0000000        1.0000000
+Lag 100          0.9384550          0.9296341        0.9085730
+Lag 200          0.8838116          0.8675997        0.8275564
+Lag 300          0.8333923          0.8117200        0.7547291
+Lag 400          0.7894578          0.7607660        0.6922554
+Lag 500          0.7507208          0.7143471        0.6399134
+        edgecov.clim1.rep nodeicov.committees-1
+Lag 0           1.0000000             1.0000000
+Lag 100         0.9351610             0.9261546
+Lag 200         0.8772971             0.8629029
+Lag 300         0.8222247             0.8076551
+Lag 400         0.7734099             0.7575854
+Lag 500         0.7276073             0.7143177
+
+Sample statistics burn-in diagnostic (Geweke):
+Chain 1 
+
+Fraction in 1st window = 0.1
+Fraction in 2nd window = 0.5 
+
+                edges          cyclicalties        transitiveties 
+              -2.5169               -2.8971               -2.4488 
+               mutual   nodeocov.odeg-rep-1  nodeocov.odeg-change 
+              -1.7966               -2.1889               -1.2057 
+ edgecov.clim1.collab  edgecov.collab.delta    nodeicov.bc-perc-1 
+              -1.8030               -0.5767               -0.1982 
+   nodeicov.bc-change      nodeifactor.dm.1     edgecov.clim1.rep 
+              -1.3413               -0.8699               -0.9608 
+nodeicov.committees-1 
+              -1.0119 
+
+P-values (lower = worse):
+                edges          cyclicalties        transitiveties 
+          0.011838943           0.003765788           0.014331986 
+               mutual   nodeocov.odeg-rep-1  nodeocov.odeg-change 
+          0.072401103           0.028603658           0.227918652 
+ edgecov.clim1.collab  edgecov.collab.delta    nodeicov.bc-perc-1 
+          0.071388306           0.564117839           0.842878156 
+   nodeicov.bc-change      nodeifactor.dm.1     edgecov.clim1.rep 
+          0.179820399           0.384347447           0.336668836 
+nodeicov.committees-1 
+          0.311604510 
+Loading required package: latticeExtra
+Loading required package: RColorBrewer
+> dev.off()
+null device 
+          1 
+> 
+> # goodness-of-fit boxplots
+> set.seed(12345)
+> gof.climate.tergm <- gof(climate.tergm, nsim = 100)
+
+No 'target' network(s) provided. Using networks on the left-hand side of the model formula as observed networks.
+
+Simulating 100 networks from the following formula:
+ clim2.rep ~ edges + cyclicalties + transitiveties + mutual + nodeocov("odeg-rep-1") + nodeocov("odeg-change") + edgecov(clim1.collab) + edgecov(collab.delta) + nodeicov("bc-perc-1") + nodeicov("bc-change") + nodeifactor("dm") + edgecov(clim1.rep) + nodeicov("committees-1") 
+
+One network from which simulations are drawn was provided.
+
+Computing classic (statnet-style) goodness of fit:
+[1/9] Comparison for dyad-wise shared partners...
+[2/9] Comparison for edge-wise shared partners...
+[3/9] Comparison for geodesic distances...
+[4/9] Comparison for degree...
+ -> Directed networks. Ignoring the 'degree' statistic.
+[5/9] Comparison for indegree...
+[6/9] Comparison for outdegree...
+[7/9] Comparison for k-stars...
+ -> Directed networks. Ignoring the 'kstar' statistic.
+[8/9] Comparison for in-stars...
+[9/9] Comparison for out-stars...
+
+Computing classification performance (ROC/PR/AUC) goodness of fit...
+t = 1: imputation of the first PR value not necessary.
+Done.
+
+Checking degeneracy...
+Done.
+> 
+> pdf("output/gof-climate-tergm.pdf", width = 8, height = 8)
+> plot(gof.climate.tergm, boxplot.odegree = FALSE, boxplot.istar = FALSE, 
++     boxplot.ostar = FALSE, roc = FALSE, pr = FALSE)
+> dev.off()
+null device 
+          1 
+> 
+> png("output/gof-climate-tergm.png", width = 8, height = 8, units = 'in', 
++     res = 300)
+> plot(gof.climate.tergm, boxplot.odegree = FALSE, boxplot.istar = FALSE, 
++     boxplot.ostar = FALSE, roc = FALSE, pr = FALSE)
+> dev.off()
+null device 
+          1 
+> 
+> 
+> # ==============================================================================
+> # Climate policy domain, STERGM
+> # ==============================================================================
+> 
+> set.vertex.attribute(clim1.rep, "odeg-change", degree(clim2.rep, 
++     cmode = "outdegree") - degree(clim1.rep, cmode = "outdegree"))
+> set.vertex.attribute(clim1.rep, "bc-change", bc)
+> 
+> set.seed(12345)
+> climate.stergm <- stergm(
++     list(clim1.rep, clim2.rep), 
++     formation = ~ 
++         edges + 
++         cyclicalties + 
++         transitiveties + 
++         mutual + 
++         nodeocov("odeg-rep") + 
++         nodeocov("odeg-change") + 
++         edgecov(clim1.collab) + 
++         edgecov(collab.delta) + 
++         nodeicov("bc-perc") + 
++         nodeicov("bc-change") + 
++         nodeifactor("dm") + 
++         nodeicov("committees"), 
++     dissolution = ~ 
++         edges + 
++         cyclicalties + 
++         transitiveties + 
++         mutual + 
++         nodeocov("odeg-rep") + 
++         nodeocov("odeg-change") + 
++         edgecov(clim1.collab) + 
++         edgecov(collab.delta) + 
++         nodeicov("bc-perc") + 
++         nodeicov("bc-change") + 
++         nodeifactor("dm") + 
++         nodeicov("committees"), 
++     estimate = "CMLE",
++     eval.loglik = TRUE, 
++     control = control.stergm(seed = 12345)
++ )
+Fitting formation...
+Iteration 1 of at most 20: 
+Convergence test P-value: 0e+00 
+The log-likelihood improved by 0.423 
+Iteration 2 of at most 20: 
+Convergence test P-value: 2.5e-72 
+The log-likelihood improved by 0.06919 
+Iteration 3 of at most 20: 
+Convergence test P-value: 4.9e-30 
+The log-likelihood improved by 0.02949 
+Iteration 4 of at most 20: 
+Convergence test P-value: 8.1e-09 
+The log-likelihood improved by 0.01 
+Iteration 5 of at most 20: 
+Convergence test P-value: 1.5e-01 
+The log-likelihood improved by 0.002536 
+Iteration 6 of at most 20: 
+Convergence test P-value: 9.6e-02 
+The log-likelihood improved by 0.005398 
+Iteration 7 of at most 20: 
+Convergence test P-value: 2.1e-01 
+The log-likelihood improved by 0.002633 
+Iteration 8 of at most 20: 
+Convergence test P-value: 5.1e-02 
+The log-likelihood improved by 0.003355 
+Iteration 9 of at most 20: 
+Convergence test P-value: 6.1e-01 
+Convergence detected. Stopping.
+The log-likelihood improved by 0.001844 
+
+This model was fit using MCMC.  To examine model diagnostics and check for degeneracy, use the mcmc.diagnostics() function.
+Fitting dissolution...
+Iteration 1 of at most 20: 
+Convergence test P-value: 0e+00 
+The log-likelihood improved by 0.3027 
+Iteration 2 of at most 20: 
+Convergence test P-value: 3.4e-148 
+The log-likelihood improved by 0.06596 
+Iteration 3 of at most 20: 
+Convergence test P-value: 1.6e-34 
+The log-likelihood improved by 0.01541 
+Iteration 4 of at most 20: 
+Convergence test P-value: 5.8e-04 
+The log-likelihood improved by 0.003669 
+Iteration 5 of at most 20: 
+Convergence test P-value: 2.3e-02 
+The log-likelihood improved by 0.001967 
+Iteration 6 of at most 20: 
+Convergence test P-value: 4.4e-02 
+The log-likelihood improved by 0.001896 
+Iteration 7 of at most 20: 
+Convergence test P-value: 5.7e-01 
+Convergence detected. Stopping.
+The log-likelihood improved by 0.0009379 
+
+This model was fit using MCMC.  To examine model diagnostics and check for degeneracy, use the mcmc.diagnostics() function.
+Warnmeldung:
+In stergm.CMLE(nw, formation, dissolution, constraints, times, offset.coef.form,  :
+  Time points not specified for a list. Modeling transition from the between successive networks jointly. This behavior may change in the future.
+> summary(climate.stergm)
+
+==============================
+Summary of formation model fit 
+==============================
+
+Formula:   ~edges + cyclicalties + transitiveties + mutual + nodeocov("odeg-rep") + 
+    nodeocov("odeg-change") + edgecov(clim1.collab) + edgecov(collab.delta) + 
+    nodeicov("bc-perc") + nodeicov("bc-change") + nodeifactor("dm") + 
+    nodeicov("committees")
+
+Iterations:  20 
+
+Monte Carlo MLE Results:
+                     Estimate Std. Error MCMC %  p-value    
+edges                -2.82499    2.75868     91 0.306124    
+cyclicalties         -0.49576    0.09017     19  < 1e-04 ***
+transitiveties        0.10824    2.40788     90 0.964155    
+mutual                0.06070    0.23614      9 0.797192    
+nodeocov.odeg-rep     0.10336    0.02856     51 0.000314 ***
+nodeocov.odeg-change  0.15588    0.02025     35  < 1e-04 ***
+edgecov.clim1.collab  1.20343    0.47256      6 0.011061 *  
+edgecov.collab.delta  1.61341    0.28776      2  < 1e-04 ***
+nodeicov.bc-perc      0.10082    0.02356      3  < 1e-04 ***
+nodeicov.bc-change    0.09273    0.02574      1 0.000334 ***
+nodeifactor.dm.1      0.66237    0.26495     12 0.012618 *  
+nodeicov.committees  -0.09861    0.16472      1 0.549583    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+     Null Deviance: 1138.1  on 821  degrees of freedom
+ Residual Deviance:  703.4  on 809  degrees of freedom
+ 
+AIC: 727.4    BIC: 783.9    (Smaller is better.) 
+
+================================
+Summary of dissolution model fit
+================================
+
+Formula:   ~edges + cyclicalties + transitiveties + mutual + nodeocov("odeg-rep") + 
+    nodeocov("odeg-change") + edgecov(clim1.collab) + edgecov(collab.delta) + 
+    nodeicov("bc-perc") + nodeicov("bc-change") + nodeifactor("dm") + 
+    nodeicov("committees")
+
+Iterations:  20 
+
+Monte Carlo MLE Results:
+                     Estimate Std. Error MCMC %  p-value    
+edges                -1.94997    1.17781     66 0.098890 .  
+cyclicalties         -0.55500    0.15153     14 0.000297 ***
+transitiveties        0.54563    0.34829     23 0.118300    
+mutual                0.15423    0.64645     27 0.811599    
+nodeocov.odeg-rep     0.13301    0.06168     56 0.031872 *  
+nodeocov.odeg-change  0.20374    0.03724     25  < 1e-04 ***
+edgecov.clim1.collab  2.09077    0.58201      3 0.000385 ***
+edgecov.collab.delta  1.77391    0.50615      2 0.000530 ***
+nodeicov.bc-perc      0.06054    0.02670      2 0.024114 *  
+nodeicov.bc-change   -0.01657    0.02559      2 0.517842    
+nodeifactor.dm.1      0.36576    0.41535      5 0.379269    
+nodeicov.committees   0.07151    0.30021     19 0.811887    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+     Null Deviance: 417.3  on 301  degrees of freedom
+ Residual Deviance: 257.3  on 289  degrees of freedom
+ 
+AIC: 281.3    BIC: 325.7    (Smaller is better.) 
+> 
+> 
+> # ==============================================================================
+> # Create table with (S)TERGM results
+> # ==============================================================================
+> 
+> htmlreg(list(climate.tergm, climate.stergm), custom.model.names = c("TERGM", 
++     "Tie Formation", "Tie Dissolution"), beside = TRUE, 
++     include.nvertices = FALSE, 
++     custom.coef.names = c("Edges", "Cyclical ties", "Transitive ties", 
++     "Reciprocity", "Outdegree of ego at t=1", "Outdegree of ego (Delta)", 
++     "Collaboration at t=1", "Collaboration (Delta)", 
++     "Betweenness of alter at t=1", "Betweenness of alter (Delta)", 
++     "Alter = decision-maker", "Lag: Influence reputation at t=1", 
++     "Committee memberships of alter at t=1", "Outdegree of ego at t=1", 
++     "Betweenness of alter at t=1", "Committee memberships of alter at t=1"), 
++     reorder.coef = c(1:6, 11, 13, 9:10, 7:8, 12), 
++     file = "output/table-tergm.doc", stars = c(0.01, 0.05, 0.1), 
++     include.aic = FALSE, include.bic = FALSE, include.loglik = FALSE)
+The table was written to the file 'output/table-tergm.doc'.
+
+> 
+> 
+> # ==============================================================================
+> # Summary statistics
+> # ==============================================================================
+> 
+> # climate 1
+> n <- dim(as.matrix(clim1.rep))[1]  # num nodes
+> n * n - n  # num dyads
+[1] 1122
+> summary(as.vector(as.matrix(clim1.rep)))  # summary reputation
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+ 0.0000  0.0000  0.0000  0.2604  1.0000  1.0000 
+> sd(as.vector(as.matrix(clim1.rep)))  # SD reputation
+[1] 0.4390322
+> summary(as.vector(as.matrix(clim1.collab)))  # summary collaboration
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+0.00000 0.00000 0.00000 0.07958 0.00000 1.00000 
+> sd(as.vector(as.matrix(clim1.collab)))  # SD collaboration
+[1] 0.2707664
+> summary(get.vertex.attribute(clim1.rep, "bc-perc"))  # summary betweenness
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  0.000   0.000   0.000   2.941   3.116  28.040 
+> sd(get.vertex.attribute(clim1.rep, "bc-perc"))  # SD betweenness
+[1] 5.897581
+> cyc <- summary(clim1.rep ~ cyclicalties)[1]
+> cyc / (n * n - n)  # mean cyclical ties
+cyclicalties 
+    0.171123 
+> sd(c(rep(1, cyc), rep(0, (n * n - n) - cyc)))  # SD cyclical ties
+[1] 0.3767843
+> median(c(rep(1, cyc), rep(0, (n * n - n) - cyc)))  # median cyclical ties
+[1] 0
+> trans <- summary(clim1.rep ~ transitiveties)[1]
+> trans / (n * n - n)  # mean transitive ties
+transitiveties 
+      0.258467 
+> sd(c(rep(1, trans), rep(0, (n * n - n) - trans)))  # SD transitive ties
+[1] 0.4379872
+> median(c(rep(1, trans), rep(0, (n * n - n) - trans)))  # median transitive ties
+[1] 0
+> recip <- summary(clim1.rep ~ mutual)[1]
+> recip / (n * n - n)  # mean reciprocity
+    mutual 
+0.04099822 
+> sd(c(rep(1, recip), rep(0, (n * n - n) - recip)))  # SD reciprocity
+[1] 0.1983745
+> median(c(rep(1, recip), rep(0, (n * n - n) - recip)))  # median reciprocity
+[1] 0
+> summary(get.vertex.attribute(clim1.rep, "odeg-rep"))  # summary outdegree
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  0.000   3.000  10.000   8.853  13.000  22.000 
+> sd(get.vertex.attribute(clim1.rep, "odeg-rep"))  # SD outdegree
+[1] 6.339546
+> summary(get.vertex.attribute(clim1.rep, "committees"))  # summary committees
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+ 0.0000  0.0000  0.0000  0.5588  1.0000  2.0000 
+> sd(get.vertex.attribute(clim1.rep, "committees"))  # SD committees
+[1] 0.6601734
+> 
+> # climate 2
+> n <- dim(as.matrix(clim2.rep))[1]  # num nodes
+> n * n - n  # num dyads
+[1] 1122
+> summary(as.vector(as.matrix(clim2.rep)))  # summary reputation
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+ 0.0000  0.0000  0.0000  0.3806  1.0000  1.0000 
+> sd(as.vector(as.matrix(clim2.rep)))  # SD reputation
+[1] 0.4857501
+> summary(as.vector(as.matrix(clim2.collab)))  # summary collaboration
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+ 0.0000  0.0000  0.0000  0.1791  0.0000  1.0000 
+> sd(as.vector(as.matrix(clim2.collab)))  # SD collaboration
+[1] 0.3835733
+> summary(get.vertex.attribute(clim2.rep, "bc-perc-2"))  # summary betweenness
+    Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+ 0.00000  0.08962  0.43130  2.94100  2.09900 28.45000 
+> sd(get.vertex.attribute(clim2.rep, "bc-perc-2"))  # SD betweenness
+[1] 5.92969
+> cyc <- summary(clim2.rep ~ cyclicalties)[1]
+> cyc / (n * n - n)  # mean cyclical ties
+cyclicalties 
+   0.3368984 
+> sd(c(rep(1, cyc), rep(0, (n * n - n) - cyc)))  # SD cyclical ties
+[1] 0.4728606
+> median(c(rep(1, cyc), rep(0, (n * n - n) - cyc)))  # median cyclical ties
+[1] 0
+> trans <- summary(clim2.rep ~ transitiveties)[1]
+> trans / (n * n - n)  # mean transitive ties
+transitiveties 
+     0.3903743 
+> sd(c(rep(1, trans), rep(0, (n * n - n) - trans)))  # SD transitive ties
+[1] 0.4880517
+> median(c(rep(1, trans), rep(0, (n * n - n) - trans)))  # median transitive ties
+[1] 0
+> recip <- summary(clim2.rep ~ mutual)[1]
+> recip / (n * n - n)  # mean reciprocity
+    mutual 
+0.08199643 
+> sd(c(rep(1, recip), rep(0, (n * n - n) - recip)))  # SD reciprocity
+[1] 0.2744816
+> median(c(rep(1, recip), rep(0, (n * n - n) - recip)))  # median reciprocity
+[1] 0
+> summary(get.vertex.attribute(clim2.rep, "odeg-rep"))  # summary outdegree
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+   0.00    8.25   14.00   12.94   16.75   25.00 
+> sd(get.vertex.attribute(clim2.rep, "odeg-rep"))  # SD outdegree
+[1] 6.367251
+> summary(get.vertex.attribute(clim2.rep, "committees-2"))  # summary committees
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+ 0.0000  0.0000  1.0000  0.6765  1.0000  1.0000 
+> sd(get.vertex.attribute(clim2.rep, "committees-2"))  # SD committees
+[1] 0.4748581
+> 
+> # climate (both time periods)
+> summary(get.vertex.attribute(clim1.rep, "dm"))  # summary decision-maker
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+ 0.0000  0.0000  0.0000  0.1765  0.0000  1.0000 
+> sd(get.vertex.attribute(clim1.rep, "dm"))  # SD decision-maker
+[1] 0.386953
+> summary(bc)  # summary betweenness delta
+    Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+-19.3600  -1.2960   0.0000   0.1151   1.3510  10.8200 
+> sd(bc)  # SD betweenness delta
+[1] 5.010524
+> summary(deg.change)  # summary outdegree delta
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+-12.000   0.000   3.000   4.088   7.000  25.000 
+> sd(deg.change)  # SD outdegree delta
+[1] 7.488851
+> summary(as.vector(collab.delta))  # summary collaboration delta
+    Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+-1.00000  0.00000  0.00000  0.09948  0.00000  1.00000 
+> sd(collab.delta)  # SD collaboration delta
+[1] 0.3476074
+> 
+> # telecom
+> n <- dim(as.matrix(telecom.rep))[1]  # num nodes
+> n * n - n  # num dyads
+[1] 1406
+> summary(as.vector(as.matrix(telecom.rep)))  # summary reputation
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
+  0.000   0.000   0.000   0.156   0.000   1.000     111 
+> sd(as.vector(as.matrix(telecom.rep)), na.rm = TRUE)  # SD reputation
+[1] 0.3630285
+> summary(as.vector(as.matrix(telecom.collab)))  # summary collaboration
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+ 0.0000  0.0000  0.0000  0.3622  1.0000  1.0000 
+> sd(as.vector(as.matrix(telecom.collab)))  # SD collaboration
+[1] 0.4807994
+> summary(get.vertex.attribute(telecom.rep, "bc-perc"))  # summary betweenness
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+ 0.0000  0.0000  0.9486  2.6320  3.7180 15.2900 
+> sd(get.vertex.attribute(telecom.rep, "bc-perc"))  # SD betweenness
+[1] 3.701177
+> summary(get.vertex.attribute(telecom.rep, "dm"))  # summary decision-maker
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+ 0.0000  0.0000  0.0000  0.3158  1.0000  1.0000 
+> sd(get.vertex.attribute(telecom.rep, "dm"))  # SD decision-maker
+[1] 0.4710691
+> cyc <- summary(telecom.rep ~ cyclicalties)[1]
+> cyc / (n * n - n)  # mean cyclical ties
+cyclicalties 
+  0.08036984 
+> sd(c(rep(1, cyc), rep(0, (n * n - n) - cyc)))  # SD cyclical ties
+[1] 0.2719616
+> median(c(rep(1, cyc), rep(0, (n * n - n) - cyc)))  # median cyclical ties
+[1] 0
+> trans <- summary(telecom.rep ~ transitiveties)[1]
+> trans / (n * n - n)  # mean transitive ties
+transitiveties 
+     0.1372688 
+> sd(c(rep(1, trans), rep(0, (n * n - n) - trans)))  # SD transitive ties
+[1] 0.3442534
+> median(c(rep(1, trans), rep(0, (n * n - n) - trans)))  # median transitive ties
+[1] 0
+> recip <- summary(telecom.rep ~ mutual)[1]
+> recip / (n * n - n)  # mean reciprocity
+    mutual 
+0.01849218 
+> sd(c(rep(1, recip), rep(0, (n * n - n) - recip)))  # SD reciprocity
+[1] 0.1347707
+> median(c(rep(1, recip), rep(0, (n * n - n) - recip)))  # median reciprocity
+[1] 0
+> summary(get.vertex.attribute(telecom.rep, "odeg-rep"))  # summary outdegree
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  0.000   0.000   6.000   5.474   8.000  24.000 
+> sd(get.vertex.attribute(telecom.rep, "odeg-rep"))  # SD outdegree
+[1] 5.525063
+> summary(get.vertex.attribute(telecom.rep, "committees"))  # summary committees
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+ 0.0000  0.0000  0.0000  0.9737  1.0000  8.0000 
+> sd(get.vertex.attribute(telecom.rep, "committees"))  # SD committees
+[1] 1.909957
+> 
+> # PM Visp
+> n <- dim(as.matrix(pmvisp.rep))[1]  # num nodes
+> n * n - n  # num dyads
+[1] 1406
+> summary(as.vector(as.matrix(pmvisp.rep)))  # summary reputation
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
+ 0.0000  0.0000  0.0000  0.4533  1.0000  1.0000     555 
+> sd(as.vector(as.matrix(pmvisp.rep)), na.rm = TRUE)  # SD reputation
+[1] 0.4980963
+> summary(as.vector(as.matrix(pmvisp.collab)))  # summary collaboration
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  0.000   0.000   0.000   0.153   0.000   1.000 
+> sd(as.vector(as.matrix(pmvisp.collab)))  # SD collaboration
+[1] 0.3601576
+> summary(get.vertex.attribute(pmvisp.rep, "bc-perc"))  # summary betweenness
+    Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+ 0.00000  0.05767  0.74930  2.63200  3.15300 23.32000 
+> sd(get.vertex.attribute(pmvisp.rep, "bc-perc"))  # SD betweenness
+[1] 4.947284
+> summary(get.vertex.attribute(pmvisp.rep, "dm"))  # summary decision-maker
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+ 0.0000  0.0000  0.0000  0.2105  0.0000  1.0000 
+> sd(get.vertex.attribute(pmvisp.rep, "dm"))  # SD decision-maker
+[1] 0.413155
+> cyc <- summary(pmvisp.rep ~ cyclicalties)[1]
+> cyc / (n * n - n)  # mean cyclical ties
+cyclicalties 
+   0.2012802 
+> sd(c(rep(1, cyc), rep(0, (n * n - n) - cyc)))  # SD cyclical ties
+[1] 0.4010996
+> median(c(rep(1, cyc), rep(0, (n * n - n) - cyc)))  # median cyclical ties
+[1] 0
+> trans <- summary(pmvisp.rep ~ transitiveties)[1]
+> trans / (n * n - n)  # mean transitive ties
+transitiveties 
+     0.2837838 
+> sd(c(rep(1, trans), rep(0, (n * n - n) - trans)))  # SD transitive ties
+[1] 0.4509936
+> median(c(rep(1, trans), rep(0, (n * n - n) - trans)))  # median transitive ties
+[1] 0
+> recip <- summary(pmvisp.rep ~ mutual)[1]
+> recip / (n * n - n)  # mean reciprocity
+    mutual 
+0.06614509 
+> sd(c(rep(1, recip), rep(0, (n * n - n) - recip)))  # SD reciprocity
+[1] 0.248624
+> median(c(rep(1, recip), rep(0, (n * n - n) - recip)))  # median reciprocity
+[1] 0
+> summary(get.vertex.attribute(pmvisp.rep, "odeg-rep"))  # summary outdegree
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+   0.00    0.00   11.50   10.61   18.00   28.00 
+> sd(get.vertex.attribute(pmvisp.rep, "odeg-rep"))  # SD outdegree
+[1] 10.141
+> summary(get.vertex.attribute(pmvisp.rep, "committees"))  # summary committees
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  0.000   0.000   2.000   1.316   2.000   3.000 
+> sd(get.vertex.attribute(pmvisp.rep, "committees"))  # SD committees
+[1] 1.210434
+> 
+> # German toxic chemicals regulation
+> n <- dim(as.matrix(chem.rep))[1]  # num nodes
+> n * n - n  # num dyads
+[1] 870
+> summary(as.vector(as.matrix(chem.rep)))  # summary reputation
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+ 0.0000  0.0000  0.0000  0.3144  1.0000  1.0000 
+> sd(as.vector(as.matrix(chem.rep)))  # SD reputation
+[1] 0.4645524
+> summary(as.vector(as.matrix(chem.collab)))  # summary collaboration
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+ 0.0000  0.0000  1.0000  0.5267  1.0000  1.0000 
+> sd(as.vector(as.matrix(chem.collab)))  # SD collaboration
+[1] 0.499566
+> summary(get.vertex.attribute(chem.rep, "bc-perc"))  # summary betweenness
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+ 0.0000  0.2921  1.3950  3.3330  4.3260 21.0500 
+> sd(get.vertex.attribute(chem.rep, "bc-perc"))  # SD betweenness
+[1] 4.736659
+> summary(get.vertex.attribute(chem.rep, "dm"))  # summary decision-maker
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+ 0.0000  0.0000  0.0000  0.3667  1.0000  1.0000 
+> sd(get.vertex.attribute(chem.rep, "dm"))  # SD decision-maker
+[1] 0.4901325
+> cyc <- summary(chem.rep ~ cyclicalties)[1]
+> cyc / (n * n - n)  # mean cyclical ties
+cyclicalties 
+   0.2505747 
+> sd(c(rep(1, cyc), rep(0, (n * n - n) - cyc)))  # SD cyclical ties
+[1] 0.4335933
+> median(c(rep(1, cyc), rep(0, (n * n - n) - cyc)))  # median cyclical ties
+[1] 0
+> trans <- summary(chem.rep ~ transitiveties)[1]
+> trans / (n * n - n)  # mean transitive ties
+transitiveties 
+     0.3103448 
+> sd(c(rep(1, trans), rep(0, (n * n - n) - trans)))  # SD transitive ties
+[1] 0.4629009
+> median(c(rep(1, trans), rep(0, (n * n - n) - trans)))  # median transitive ties
+[1] 0
+> recip <- summary(chem.rep ~ mutual)[1]
+> recip / (n * n - n)  # mean reciprocity
+    mutual 
+0.06206897 
+> sd(c(rep(1, recip), rep(0, (n * n - n) - recip)))  # SD reciprocity
+[1] 0.2414196
+> median(c(rep(1, recip), rep(0, (n * n - n) - recip)))  # median reciprocity
+[1] 0
+> summary(get.vertex.attribute(chem.rep, "odeg-rep"))  # summary outdegree
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  0.000   6.250  10.000   9.433  12.000  19.000 
+> sd(get.vertex.attribute(chem.rep, "odeg-rep"))  # SD outdegree
+[1] 4.280536
+> summary(get.vertex.attribute(chem.rep, "committees"))  # summary committees
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+   1.00    2.00    4.50    6.00    9.75   17.00 
+> sd(get.vertex.attribute(chem.rep, "committees"))  # SD committees
+[1] 4.792235
+> 
+> 
+> # ==============================================================================
+> # Appendix: use indegree centrality instead of betweenness centrality
+> # ==============================================================================
+> 
+> set.vertex.attribute(clim1.rep, "ideg-perc", 100 * degree(clim1.collab, 
++     cmode = "indegree", rescale = TRUE))
+> set.vertex.attribute(clim2.rep, "ideg-perc-2", 100 * degree(clim2.collab, 
++     cmode = "indegree", rescale = TRUE))
+> set.vertex.attribute(telecom.rep, "ideg-perc", 100 * degree(telecom.collab, 
++     cmode = "indegree", rescale = TRUE))
+> set.vertex.attribute(pmvisp.rep, "ideg-perc", 100 * degree(pmvisp.collab, 
++     cmode = "indegree", rescale = TRUE))
+> set.vertex.attribute(chem.rep, "ideg-perc", 100 * degree(chem.collab, 
++     cmode = "indegree", rescale = TRUE))
+> 
+> set.seed(12345)
+> climate1.indegree <- ergm(clim1.rep ~ 
++     edges + 
++     cyclicalties + 
++     transitiveties + 
++     mutual + 
++     nodeocov("odeg-rep") + 
++     edgecov(clim1.collab) + 
++     nodeicov("ideg-perc") + 
++     nodeifactor("dm") + 
++     nodeicov("committees"), 
++     control = control.ergm(seed = 12345)
++ )  # ERGM (model 1)
+Iteration 1 of at most 20: 
+Convergence test P-value: 1.1e-273 
+The log-likelihood improved by 0.3068 
+Iteration 2 of at most 20: 
+Convergence test P-value: 2.2e-87 
+The log-likelihood improved by 0.08604 
+Iteration 3 of at most 20: 
+Convergence test P-value: 1.2e-25 
+The log-likelihood improved by 0.02962 
+Iteration 4 of at most 20: 
+Convergence test P-value: 3.5e-02 
+The log-likelihood improved by 0.003988 
+Iteration 5 of at most 20: 
+Convergence test P-value: 2.2e-08 
+The log-likelihood improved by 0.01403 
+Iteration 6 of at most 20: 
+Convergence test P-value: 5.1e-01 
+Convergence detected. Stopping.
+The log-likelihood improved by 0.002117 
+
+This model was fit using MCMC.  To examine model diagnostics and check for degeneracy, use the mcmc.diagnostics() function.
+> summary(climate1.indegree)
+
+==========================
+Summary of model fit
+==========================
+
+Formula:   clim1.rep ~ edges + cyclicalties + transitiveties + mutual + 
+    nodeocov("odeg-rep") + edgecov(clim1.collab) + nodeicov("ideg-perc") + 
+    nodeifactor("dm") + nodeicov("committees")
+
+Iterations:  20 
+
+Monte Carlo MLE Results:
+                     Estimate Std. Error MCMC %  p-value    
+edges                -5.25226    1.10399     85  < 1e-04 ***
+cyclicalties         -0.34961    0.09347     18 0.000193 ***
+transitiveties        0.73540    0.54107     64 0.174367    
+mutual                0.34525    0.31017     14 0.265902    
+nodeocov.odeg-rep     0.21627    0.03393     65  < 1e-04 ***
+edgecov.clim1.collab  1.23654    0.31349      2  < 1e-04 ***
+nodeicov.ideg-perc    0.30185    0.05127     51  < 1e-04 ***
+nodeifactor.dm.1      0.88026    0.25213     30 0.000500 ***
+nodeicov.committees   0.36398    0.15315     13 0.017641 *  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+     Null Deviance: 1555.4  on 1122  degrees of freedom
+ Residual Deviance:  836.4  on 1113  degrees of freedom
+ 
+AIC: 854.4    BIC: 899.6    (Smaller is better.) 
+> 
+> set.seed(12345)
+> climate2.indegree <- ergm(clim2.rep ~ 
++     edges + 
++     cyclicalties + 
++     transitiveties + 
++     mutual + 
++     nodeocov("odeg-rep") + 
++     edgecov(clim2.collab) + 
++     nodeicov("ideg-perc-2") + 
++     nodeifactor("dm") + 
++     nodeicov("committees-2"), 
++     control = control.ergm(seed = 12345)
++ )  # ERGM (model 2)
+Iteration 1 of at most 20: 
+Convergence test P-value: 0e+00 
+The log-likelihood improved by 0.6344 
+Iteration 2 of at most 20: 
+Convergence test P-value: 2.7e-96 
+The log-likelihood improved by 0.1282 
+Iteration 3 of at most 20: 
+Convergence test P-value: 2e-15 
+The log-likelihood improved by 0.03001 
+Iteration 4 of at most 20: 
+Convergence test P-value: 3.2e-02 
+The log-likelihood improved by 0.005636 
+Iteration 5 of at most 20: 
+Convergence test P-value: 9.6e-03 
+The log-likelihood improved by 0.006859 
+Iteration 6 of at most 20: 
+Convergence test P-value: 2.6e-01 
+The log-likelihood improved by 0.004308 
+Iteration 7 of at most 20: 
+Convergence test P-value: 1e-02 
+The log-likelihood improved by 0.005802 
+Iteration 8 of at most 20: 
+Convergence test P-value: 3.6e-01 
+The log-likelihood improved by 0.00301 
+Iteration 9 of at most 20: 
+Convergence test P-value: 1.7e-02 
+The log-likelihood improved by 0.006359 
+Iteration 10 of at most 20: 
+Convergence test P-value: 6.2e-02 
+The log-likelihood improved by 0.005526 
+Iteration 11 of at most 20: 
+Convergence test P-value: 3.6e-01 
+The log-likelihood improved by 0.005881 
+Iteration 12 of at most 20: 
+Convergence test P-value: 7.2e-06 
+The log-likelihood improved by 0.01416 
+Iteration 13 of at most 20: 
+Convergence test P-value: 2.7e-01 
+The log-likelihood improved by 0.004105 
+Iteration 14 of at most 20: 
+Convergence test P-value: 1.3e-01 
+The log-likelihood improved by 0.004044 
+Iteration 15 of at most 20: 
+Convergence test P-value: 4.7e-01 
+The log-likelihood improved by 0.0031 
+Iteration 16 of at most 20: 
+Convergence test P-value: 6.8e-01 
+Convergence detected. Stopping.
+The log-likelihood improved by 0.001844 
+
+This model was fit using MCMC.  To examine model diagnostics and check for degeneracy, use the mcmc.diagnostics() function.
+> summary(climate2.indegree)
+
+==========================
+Summary of model fit
+==========================
+
+Formula:   clim2.rep ~ edges + cyclicalties + transitiveties + mutual + 
+    nodeocov("odeg-rep") + edgecov(clim2.collab) + nodeicov("ideg-perc-2") + 
+    nodeifactor("dm") + nodeicov("committees-2")
+
+Iterations:  20 
+
+Monte Carlo MLE Results:
+                      Estimate Std. Error MCMC %  p-value    
+edges                 -5.66246    4.45728     97 0.204213    
+cyclicalties          -0.37083    0.09087     13  < 1e-04 ***
+transitiveties         1.33459    3.67311     96 0.716420    
+mutual                 0.18833    0.22151      7 0.395398    
+nodeocov.odeg-rep      0.18992    0.03223     78  < 1e-04 ***
+edgecov.clim2.collab   1.30495    0.20821      0  < 1e-04 ***
+nodeicov.ideg-perc-2   0.55635    0.08005     66  < 1e-04 ***
+nodeifactor.dm.1       0.79275    0.23316     27 0.000698 ***
+nodeicov.committees-2 -0.60563    0.17537      5 0.000574 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+     Null Deviance: 1555.4  on 1122  degrees of freedom
+ Residual Deviance:  952.6  on 1113  degrees of freedom
+ 
+AIC: 970.6    BIC: 1016    (Smaller is better.) 
+> 
+> set.seed(12345)
+> telecom.indegree <- ergm(telecom.rep ~ 
++     edges + 
++     cyclicalties + 
++     transitiveties + 
++     mutual + 
++     nodeocov("odeg-rep") + 
++     edgecov(telecom.collab) + 
++     nodeicov("ideg-perc") + 
++     nodeifactor("dm") + 
++     nodeicov("committees"), 
++     control = control.ergm(seed = 12345)
++ )  # ERGM (model 3)
+Iteration 1 of at most 20: 
+Convergence test P-value: 8.1e-86 
+The log-likelihood improved by 0.1845 
+Iteration 2 of at most 20: 
+Convergence test P-value: 4.1e-20 
+The log-likelihood improved by 0.04659 
+Iteration 3 of at most 20: 
+Convergence test P-value: 3.2e-03 
+The log-likelihood improved by 0.007255 
+Iteration 4 of at most 20: 
+Convergence test P-value: 1.3e-05 
+The log-likelihood improved by 0.01751 
+Iteration 5 of at most 20: 
+Convergence test P-value: 1.7e-03 
+The log-likelihood improved by 0.008555 
+Iteration 6 of at most 20: 
+Convergence test P-value: 1.6e-01 
+The log-likelihood improved by 0.004684 
+Iteration 7 of at most 20: 
+Convergence test P-value: 1.2e-01 
+The log-likelihood improved by 0.004042 
+Iteration 8 of at most 20: 
+Convergence test P-value: 5.6e-01 
+Convergence detected. Stopping.
+The log-likelihood improved by 0.002674 
+
+This model was fit using MCMC.  To examine model diagnostics and check for degeneracy, use the mcmc.diagnostics() function.
+> summary(telecom.indegree)
+
+==========================
+Summary of model fit
+==========================
+
+Formula:   telecom.rep ~ edges + cyclicalties + transitiveties + mutual + 
+    nodeocov("odeg-rep") + edgecov(telecom.collab) + nodeicov("ideg-perc") + 
+    nodeifactor("dm") + nodeicov("committees")
+
+Iterations:  20 
+
+Monte Carlo MLE Results:
+                        Estimate Std. Error MCMC %  p-value    
+edges                  -10.38375    4.56513     97 0.023095 *  
+cyclicalties            -0.17749    0.11270      9 0.115523    
+transitiveties           0.74118    0.43142     38 0.086040 .  
+mutual                   0.15788    0.52078     20 0.761822    
+nodeocov.odeg-rep        0.27469    0.11536     94 0.017407 *  
+edgecov.telecom.collab   1.27232    0.35024     23 0.000292 ***
+nodeicov.ideg-perc       1.32422    0.87476     95 0.130319    
+nodeifactor.dm.1         2.12074    0.64983     81 0.001129 ** 
+nodeicov.committees      0.02306    0.11458     62 0.840557    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+     Null Deviance: 1795.3  on 1295  degrees of freedom
+ Residual Deviance:  527.5  on 1286  degrees of freedom
+ 
+AIC: 545.5    BIC: 592    (Smaller is better.) 
+> 
+> set.seed(12345)
+> pmvisp.indegree <- ergm(pmvisp.rep ~ 
++     edges + 
++     cyclicalties + 
++     transitiveties + 
++     mutual + 
++     nodeocov("odeg-rep") + 
++     edgecov(pmvisp.collab) + 
++     nodeicov("ideg-perc") + 
++     nodeifactor("dm") + 
++     nodeicov("committees"), 
++     control = control.ergm(seed = 12345)
++ )  # ERGM (model 4)
+Iteration 1 of at most 20: 
+Convergence test P-value: 0e+00 
+The log-likelihood improved by 1.792 
+Iteration 2 of at most 20: 
+Convergence test P-value: 7.8e-92 
+The log-likelihood improved by 0.2056 
+Iteration 3 of at most 20: 
+Convergence test P-value: 5.1e-17 
+The log-likelihood improved by 0.06297 
+Iteration 4 of at most 20: 
+Convergence test P-value: 1.9e-05 
+The log-likelihood improved by 0.02849 
+Iteration 5 of at most 20: 
+Convergence test P-value: 3.2e-02 
+The log-likelihood improved by 0.01273 
+Iteration 6 of at most 20: 
+Convergence test P-value: 4.2e-01 
+The log-likelihood improved by 0.006268 
+Iteration 7 of at most 20: 
+Convergence test P-value: 2.7e-03 
+The log-likelihood improved by 0.01765 
+Iteration 8 of at most 20: 
+Convergence test P-value: 4.3e-01 
+The log-likelihood improved by 0.007196 
+Iteration 9 of at most 20: 
+Convergence test P-value: 1.3e-01 
+The log-likelihood improved by 0.009227 
+Iteration 10 of at most 20: 
+Convergence test P-value: 2.2e-03 
+The log-likelihood improved by 0.01635 
+Iteration 11 of at most 20: 
+Convergence test P-value: 6.4e-01 
+Convergence detected. Stopping.
+The log-likelihood improved by 0.005125 
+
+This model was fit using MCMC.  To examine model diagnostics and check for degeneracy, use the mcmc.diagnostics() function.
+> summary(pmvisp.indegree)
+
+==========================
+Summary of model fit
+==========================
+
+Formula:   pmvisp.rep ~ edges + cyclicalties + transitiveties + mutual + 
+    nodeocov("odeg-rep") + edgecov(pmvisp.collab) + nodeicov("ideg-perc") + 
+    nodeifactor("dm") + nodeicov("committees")
+
+Iterations:  20 
+
+Monte Carlo MLE Results:
+                      Estimate Std. Error MCMC % p-value    
+edges                 -3.58306    1.82337     94 0.04973 *  
+cyclicalties          -0.24007    0.16006     14 0.13402    
+transitiveties        -0.89598    0.94947     84 0.34561    
+mutual                 0.46267    0.25398      7 0.06885 .  
+nodeocov.odeg-rep      0.15460    0.02819     80 < 1e-04 ***
+edgecov.pmvisp.collab  1.74589    0.25476      6 < 1e-04 ***
+nodeicov.ideg-perc     0.37484    0.08965     51 < 1e-04 ***
+nodeifactor.dm.1       0.72042    0.27303     17 0.00848 ** 
+nodeicov.committees    0.27239    0.13518     60 0.04422 *  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+     Null Deviance: 1179.7  on 851  degrees of freedom
+ Residual Deviance:  813.1  on 842  degrees of freedom
+ 
+AIC: 831.1    BIC: 873.8    (Smaller is better.) 
+> 
+> set.seed(12345)
+> chem.indegree <- ergm(chem.rep ~ 
++     edges + 
++     cyclicalties + 
++     transitiveties + 
++     mutual + 
++     nodeocov("odeg-rep") + 
++     edgecov(chem.collab) + 
++     nodeicov("ideg-perc") + 
++     nodeifactor("dm") + 
++     nodeicov("committees"), 
++     control = control.ergm(seed = 12345)
++ )  # ERGM (model 5)
+Iteration 1 of at most 20: 
+Convergence test P-value: 0e+00 
+The log-likelihood improved by 0.4566 
+Iteration 2 of at most 20: 
+Convergence test P-value: 1.1e-132 
+The log-likelihood improved by 0.1105 
+Iteration 3 of at most 20: 
+Convergence test P-value: 2.4e-32 
+The log-likelihood improved by 0.02948 
+Iteration 4 of at most 20: 
+Convergence test P-value: 4.7e-07 
+The log-likelihood improved by 0.008351 
+Iteration 5 of at most 20: 
+Convergence test P-value: 9.6e-03 
+The log-likelihood improved by 0.003763 
+Iteration 6 of at most 20: 
+Convergence test P-value: 4.9e-01 
+The log-likelihood improved by 0.001765 
+Iteration 7 of at most 20: 
+Convergence test P-value: 2.4e-01 
+The log-likelihood improved by 0.002372 
+Iteration 8 of at most 20: 
+Convergence test P-value: 5.7e-01 
+Convergence detected. Stopping.
+The log-likelihood improved by 0.001637 
+
+This model was fit using MCMC.  To examine model diagnostics and check for degeneracy, use the mcmc.diagnostics() function.
+> summary(chem.indegree)
+
+==========================
+Summary of model fit
+==========================
+
+Formula:   chem.rep ~ edges + cyclicalties + transitiveties + mutual + nodeocov("odeg-rep") + 
+    edgecov(chem.collab) + nodeicov("ideg-perc") + nodeifactor("dm") + 
+    nodeicov("committees")
+
+Iterations:  20 
+
+Monte Carlo MLE Results:
+                     Estimate Std. Error MCMC %  p-value    
+edges               -6.671606   1.734269     88 0.000128 ***
+cyclicalties        -0.114055   0.115691     33 0.324482    
+transitiveties       0.002151   0.458044     47 0.996255    
+mutual               0.412974   0.297898     15 0.166015    
+nodeocov.odeg-rep    0.253656   0.053968     75  < 1e-04 ***
+edgecov.chem.collab  0.364691   0.218323      1 0.095200 .  
+nodeicov.ideg-perc   0.589750   0.275762     68 0.032747 *  
+nodeifactor.dm.1     1.179361   0.211325      0  < 1e-04 ***
+nodeicov.committees  0.084424   0.040264     21 0.036305 *  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+     Null Deviance: 1206.1  on 870  degrees of freedom
+ Residual Deviance:  724.6  on 861  degrees of freedom
+ 
+AIC: 742.6    BIC: 785.6    (Smaller is better.) 
+> 
+> htmlreg(list(climate1.indegree, climate2.indegree, telecom.indegree, 
++     pmvisp.indegree, chem.indegree), file = "output/table-indegree.doc", 
++     custom.model.names = c("Climate 95-00", "Climate 02-05", "Telecom", 
++     "PM Visp", "Chemicals"), custom.coef.names = c("Edges", "Cyclical ties", 
++     "Transitive tries", "Reciprocity", "Outdegree of ego", "Collaboration", 
++     "Indegree of alter", "Alter = decision-maker", 
++     "Committee memberships of alter", "Collaboration", "Indegree of alter", 
++     "Committee memberships of alter", "Collaboration", "Collaboration", 
++     "Collaboration"), reorder.coef = c(1:5, 8:9, 7, 6), 
++     stars = c(0.01, 0.05, 0.1))
+The table was written to the file 'output/table-indegree.doc'.
+
+> 
+> 
+> # ==============================================================================
+> # Appendix: use eigenvector centrality instead of betweenness centrality
+> # ==============================================================================
+> 
+> set.vertex.attribute(clim1.rep, "evcent-perc", 100 * evcent(clim1.collab, 
++     rescale = TRUE))
+> set.vertex.attribute(clim2.rep, "evcent-perc-2", 100 * evcent(clim2.collab, 
++     rescale = TRUE))
+> set.vertex.attribute(telecom.rep, "evcent-perc", 100 * evcent(telecom.collab, 
++     rescale = TRUE))
+> set.vertex.attribute(pmvisp.rep, "evcent-perc", 100 * evcent(pmvisp.collab, 
++     rescale = TRUE))
+> set.vertex.attribute(chem.rep, "evcent-perc", 100 * evcent(chem.collab, 
++     rescale = TRUE))
+> 
+> set.seed(12345)
+> climate1.eigenvector <- ergm(clim1.rep ~ 
++     edges + 
++     cyclicalties + 
++     transitiveties + 
++     mutual + 
++     nodeocov("odeg-rep") + 
++     edgecov(clim1.collab) + 
++     nodeicov("evcent-perc") + 
++     nodeifactor("dm") + 
++     nodeicov("committees"), 
++     control = control.ergm(seed = 12345)
++ )  # ERGM (model 1)
+Iteration 1 of at most 20: 
+Convergence test P-value: 0e+00 
+The log-likelihood improved by 0.7208 
+Iteration 2 of at most 20: 
+Convergence test P-value: 4.1e-167 
+The log-likelihood improved by 0.1869 
+Iteration 3 of at most 20: 
+Convergence test P-value: 3.2e-36 
+The log-likelihood improved by 0.04965 
+Iteration 4 of at most 20: 
+Convergence test P-value: 6.5e-09 
+The log-likelihood improved by 0.01313 
+Iteration 5 of at most 20: 
+Convergence test P-value: 1.9e-01 
+The log-likelihood improved by 0.003304 
+Iteration 6 of at most 20: 
+Convergence test P-value: 1.5e-02 
+The log-likelihood improved by 0.00475 
+Iteration 7 of at most 20: 
+Convergence test P-value: 9.7e-01 
+Convergence detected. Stopping.
+The log-likelihood improved by 0.0007856 
+
+This model was fit using MCMC.  To examine model diagnostics and check for degeneracy, use the mcmc.diagnostics() function.
+> summary(climate1.eigenvector)
+
+==========================
+Summary of model fit
+==========================
+
+Formula:   clim1.rep ~ edges + cyclicalties + transitiveties + mutual + 
+    nodeocov("odeg-rep") + edgecov(clim1.collab) + nodeicov("evcent-perc") + 
+    nodeifactor("dm") + nodeicov("committees")
+
+Iterations:  20 
+
+Monte Carlo MLE Results:
+                     Estimate Std. Error MCMC %  p-value    
+edges                -4.43873    0.97976     84  < 1e-04 ***
+cyclicalties         -0.46393    0.09099      5  < 1e-04 ***
+transitiveties        0.95244    0.58892     69 0.106105    
+mutual                0.39574    0.27327      6 0.147859    
+nodeocov.odeg-rep     0.17750    0.02578     54  < 1e-04 ***
+edgecov.clim1.collab  1.78422    0.25890      1  < 1e-04 ***
+nodeicov.evcent-perc  0.05972    0.03302      1 0.070774 .  
+nodeifactor.dm.1      0.93945    0.25122     27 0.000194 ***
+nodeicov.committees   0.71467    0.18242     28  < 1e-04 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+     Null Deviance: 1555.4  on 1122  degrees of freedom
+ Residual Deviance:  918.8  on 1113  degrees of freedom
+ 
+AIC: 936.8    BIC: 982    (Smaller is better.) 
+> 
+> set.seed(12345)
+> climate2.eigenvector <- ergm(clim2.rep ~ 
++     edges + 
++     cyclicalties + 
++     transitiveties + 
++     mutual + 
++     nodeocov("odeg-rep") + 
++     edgecov(clim2.collab) + 
++     nodeicov("evcent-perc-2") + 
++     nodeifactor("dm") + 
++     nodeicov("committees-2"), 
++     control = control.ergm(seed = 12345)
++ )  # ERGM (model 2)
+Iteration 1 of at most 20: 
+Convergence test P-value: 0e+00 
+The log-likelihood improved by 2.876 
+Iteration 2 of at most 20: 
+Convergence test P-value: 1.8e-111 
+The log-likelihood improved by 0.1346 
+Iteration 3 of at most 20: 
+Convergence test P-value: 4.8e-41 
+The log-likelihood improved by 0.06035 
+Iteration 4 of at most 20: 
+Convergence test P-value: 3.6e-09 
+The log-likelihood improved by 0.01884 
+Iteration 5 of at most 20: 
+Convergence test P-value: 1.3e-01 
+The log-likelihood improved by 0.006382 
+Iteration 6 of at most 20: 
+Convergence test P-value: 8.9e-01 
+Convergence detected. Stopping.
+The log-likelihood improved by 0.002036 
+
+This model was fit using MCMC.  To examine model diagnostics and check for degeneracy, use the mcmc.diagnostics() function.
+> summary(climate2.eigenvector)
+
+==========================
+Summary of model fit
+==========================
+
+Formula:   clim2.rep ~ edges + cyclicalties + transitiveties + mutual + 
+    nodeocov("odeg-rep") + edgecov(clim2.collab) + nodeicov("evcent-perc-2") + 
+    nodeifactor("dm") + nodeicov("committees-2")
+
+Iterations:  20 
+
+Monte Carlo MLE Results:
+                       Estimate Std. Error MCMC %  p-value    
+edges                  -4.08785    4.99315     98 0.413138    
+cyclicalties           -0.51296    0.07431     13  < 1e-04 ***
+transitiveties          1.31523    4.32096     97 0.760892    
+mutual                 -0.09968    0.22668     17 0.660228    
+nodeocov.odeg-rep       0.14173    0.02795     78  < 1e-04 ***
+edgecov.clim2.collab    1.94438    0.24139     33  < 1e-04 ***
+nodeicov.evcent-perc-2  0.26123    0.05377     55  < 1e-04 ***
+nodeifactor.dm.1        0.71473    0.20924     23 0.000659 ***
+nodeicov.committees-2  -0.35572    0.17013     10 0.036768 *  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+     Null Deviance: 1555  on 1122  degrees of freedom
+ Residual Deviance: 1102  on 1113  degrees of freedom
+ 
+AIC: 1120    BIC: 1165    (Smaller is better.) 
+> 
+> set.seed(12345)
+> telecom.eigenvector <- ergm(telecom.rep ~ 
++     edges + 
++     cyclicalties + 
++     transitiveties + 
++     mutual + 
++     nodeocov("odeg-rep") + 
++     edgecov(telecom.collab) + 
++     nodeicov("evcent-perc") + 
++     nodeifactor("dm") + 
++     nodeicov("committees"), 
++     control = control.ergm(seed = 12345)
++ )  # ERGM (model 3)
+Iteration 1 of at most 20: 
+Convergence test P-value: 0e+00 
+The log-likelihood improved by 0.9928 
+Iteration 2 of at most 20: 
+Convergence test P-value: 6.9e-26 
+The log-likelihood improved by 0.05861 
+Iteration 3 of at most 20: 
+Convergence test P-value: 4e-01 
+The log-likelihood improved by 0.004133 
+Iteration 4 of at most 20: 
+Convergence test P-value: 2.1e-01 
+The log-likelihood improved by 0.006607 
+Iteration 5 of at most 20: 
+Convergence test P-value: 9.7e-01 
+Convergence detected. Stopping.
+The log-likelihood improved by 0.0009207 
+
+This model was fit using MCMC.  To examine model diagnostics and check for degeneracy, use the mcmc.diagnostics() function.
+> summary(telecom.eigenvector)
+
+==========================
+Summary of model fit
+==========================
+
+Formula:   telecom.rep ~ edges + cyclicalties + transitiveties + mutual + 
+    nodeocov("odeg-rep") + edgecov(telecom.collab) + nodeicov("evcent-perc") + 
+    nodeifactor("dm") + nodeicov("committees")
+
+Iterations:  20 
+
+Monte Carlo MLE Results:
+                       Estimate Std. Error MCMC %  p-value    
+edges                  -6.94846    1.91909     93 0.000305 ***
+cyclicalties           -0.21905    0.10712     11 0.041067 *  
+transitiveties          1.22792    0.63705     73 0.054136 .  
+mutual                  0.26917    0.53956     28 0.617963    
+nodeocov.odeg-rep       0.18275    0.04658     77  < 1e-04 ***
+edgecov.telecom.collab  1.80230    0.41072     57  < 1e-04 ***
+nodeicov.evcent-perc    0.17689    0.15543     76 0.255295    
+nodeifactor.dm.1        2.12148    0.53871     77  < 1e-04 ***
+nodeicov.committees     0.20932    0.06142      7 0.000674 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+     Null Deviance: 1795.3  on 1295  degrees of freedom
+ Residual Deviance:  628.1  on 1286  degrees of freedom
+ 
+AIC: 646.1    BIC: 692.6    (Smaller is better.) 
+> 
+> set.seed(12345)
+> pmvisp.eigenvector <- ergm(pmvisp.rep ~ 
++     edges + 
++     cyclicalties + 
++     transitiveties + 
++     mutual + 
++     nodeocov("odeg-rep") + 
++     edgecov(pmvisp.collab) + 
++     nodeicov("evcent-perc") + 
++     nodeifactor("dm") + 
++     nodeicov("committees"), 
++     control = control.ergm(seed = 12345)
++ )  # ERGM (model 4)
+Iteration 1 of at most 20: 
+Convergence test P-value: 0e+00 
+The log-likelihood improved by 2.488 
+Iteration 2 of at most 20: 
+Convergence test P-value: 5.8e-163 
+The log-likelihood improved by 0.39 
+Iteration 3 of at most 20: 
+Convergence test P-value: 3.6e-28 
+The log-likelihood improved by 0.08766 
+Iteration 4 of at most 20: 
+Convergence test P-value: 8.9e-14 
+The log-likelihood improved by 0.0628 
+Iteration 5 of at most 20: 
+Convergence test P-value: 1.1e-01 
+The log-likelihood improved by 0.01058 
+Iteration 6 of at most 20: 
+Convergence test P-value: 2.4e-04 
+The log-likelihood improved by 0.01937 
+Iteration 7 of at most 20: 
+Convergence test P-value: 1.9e-01 
+The log-likelihood improved by 0.008929 
+Iteration 8 of at most 20: 
+Convergence test P-value: 4.4e-04 
+The log-likelihood improved by 0.02201 
+Iteration 9 of at most 20: 
+Convergence test P-value: 6.1e-02 
+The log-likelihood improved by 0.01129 
+Iteration 10 of at most 20: 
+Convergence test P-value: 5.9e-02 
+The log-likelihood improved by 0.01064 
+Iteration 11 of at most 20: 
+Convergence test P-value: 5.8e-01 
+Convergence detected. Stopping.
+The log-likelihood improved by 0.004843 
+
+This model was fit using MCMC.  To examine model diagnostics and check for degeneracy, use the mcmc.diagnostics() function.
+> summary(pmvisp.eigenvector)
+
+==========================
+Summary of model fit
+==========================
+
+Formula:   pmvisp.rep ~ edges + cyclicalties + transitiveties + mutual + 
+    nodeocov("odeg-rep") + edgecov(pmvisp.collab) + nodeicov("evcent-perc") + 
+    nodeifactor("dm") + nodeicov("committees")
+
+Iterations:  20 
+
+Monte Carlo MLE Results:
+                      Estimate Std. Error MCMC % p-value    
+edges                 -3.46012    1.71901     94 0.04445 *  
+cyclicalties          -0.15065    0.16712     20 0.36758    
+transitiveties        -0.97881    0.84467     83 0.24687    
+mutual                 0.52610    0.27186      6 0.05330 .  
+nodeocov.odeg-rep      0.15261    0.02581     78 < 1e-04 ***
+edgecov.pmvisp.collab  1.80615    0.26114      1 < 1e-04 ***
+nodeicov.evcent-perc   0.27702    0.08507     57 0.00117 ** 
+nodeifactor.dm.1       0.74659    0.29910     29 0.01275 *  
+nodeicov.committees    0.36597    0.13867     67 0.00847 ** 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+     Null Deviance: 1179.7  on 851  degrees of freedom
+ Residual Deviance:  825.3  on 842  degrees of freedom
+ 
+AIC: 843.3    BIC: 886    (Smaller is better.) 
+> 
+> set.seed(12345)
+> chem.eigenvector <- ergm(chem.rep ~ 
++     edges + 
++     cyclicalties + 
++     transitiveties + 
++     mutual + 
++     nodeocov("odeg-rep") + 
++     edgecov(chem.collab) + 
++     nodeicov("evcent-perc") + 
++     nodeifactor("dm") + 
++     nodeicov("committees"), 
++     control = control.ergm(seed = 12345)
++ )  # ERGM (model 5)
+Iteration 1 of at most 20: 
+Convergence test P-value: 0e+00 
+The log-likelihood improved by 0.5009 
+Iteration 2 of at most 20: 
+Convergence test P-value: 1.3e-160 
+The log-likelihood improved by 0.1317 
+Iteration 3 of at most 20: 
+Convergence test P-value: 1.7e-38 
+The log-likelihood improved by 0.03173 
+Iteration 4 of at most 20: 
+Convergence test P-value: 6.3e-05 
+The log-likelihood improved by 0.006345 
+Iteration 5 of at most 20: 
+Convergence test P-value: 2.9e-06 
+The log-likelihood improved by 0.007578 
+Iteration 6 of at most 20: 
+Convergence test P-value: 3.7e-01 
+The log-likelihood improved by 0.001896 
+Iteration 7 of at most 20: 
+Convergence test P-value: 5.5e-01 
+Convergence detected. Stopping.
+The log-likelihood improved by 0.001521 
+
+This model was fit using MCMC.  To examine model diagnostics and check for degeneracy, use the mcmc.diagnostics() function.
+> summary(chem.eigenvector)
+
+==========================
+Summary of model fit
+==========================
+
+Formula:   chem.rep ~ edges + cyclicalties + transitiveties + mutual + nodeocov("odeg-rep") + 
+    edgecov(chem.collab) + nodeicov("evcent-perc") + nodeifactor("dm") + 
+    nodeicov("committees")
+
+Iterations:  20 
+
+Monte Carlo MLE Results:
+                     Estimate Std. Error MCMC %  p-value    
+edges                -6.71991    2.03395     89 0.000993 ***
+cyclicalties         -0.12022    0.12312     45 0.329110    
+transitiveties       -0.00236    0.44094     42 0.995731    
+mutual                0.40657    0.30208     17 0.178690    
+nodeocov.odeg-rep     0.25008    0.05549     76  < 1e-04 ***
+edgecov.chem.collab   0.42663    0.22112      5 0.054005 .  
+nodeicov.evcent-perc  0.54785    0.36622     76 0.135024    
+nodeifactor.dm.1      1.22908    0.22537      1  < 1e-04 ***
+nodeicov.committees   0.11393    0.04109     29 0.005684 ** 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+     Null Deviance: 1206.1  on 870  degrees of freedom
+ Residual Deviance:  730.6  on 861  degrees of freedom
+ 
+AIC: 748.6    BIC: 791.5    (Smaller is better.) 
+> 
+> htmlreg(list(climate1.eigenvector, climate2.eigenvector, telecom.eigenvector, 
++     pmvisp.eigenvector, chem.eigenvector), file = 
++     "output/table-eigenvector.doc", custom.model.names = c("Climate 95-00", 
++     "Climate 02-05", "Telecom", "PM Visp", "Chemicals"), custom.coef.names = 
++     c("Edges", "Cyclical ties", "Transitive tries", "Reciprocity", 
++     "Outdegree of ego", "Collaboration", "Eigenvector centrality of alter", 
++     "Alter = decision-maker", "Committee memberships of alter", 
++     "Collaboration", "Eigenvector centrality of alter", 
++     "Committee memberships of alter", "Collaboration", "Collaboration", 
++     "Collaboration"), reorder.coef = c(1:5, 8:9, 7, 6), 
++     stars = c(0.01, 0.05, 0.1))
+The table was written to the file 'output/table-eigenvector.doc'.
+
+> 
+> 
+> proc.time()
+       User      System verstrichen 
+   1233.106       0.423    1235.735 
