@@ -16,7 +16,23 @@ library("xergm")
 ```
 
 ### Introduction
-For this project we are reproducing results from Ingold and Leifeld (2016), titled 'Structural and Institutional Determinants of Influence and Reputation: A Comparison of Collaborative and Adversarial Policy Networks in Decision Making and Implementation` from the Journal of Public Administration Research and Theory. T
+(give background as to what we are doing )
+For this project we are reproducing results from Ingold and Leifeld (2016), titled 'Structural and Institutional Determinants of Influence and Reputation: A Comparison of Collaborative and Adversarial Policy Networks in Decision Making and Implementation` from the Journal of Public Administration Research and Theory. T 
+
+(what are the authors proposing)
+
+### Data
+(describe the data we have)
+
+
+### Visuals 
+(make some plots of the networks)
+
+
+
+### Models 
+(code and explain what's going on and what the covariates explain etc and how that relates to the research question proposing)
+
 ```{r}
 clim1.rep <- network(as.matrix(read.csv2("data/input/climate9500-rep.csv", row.names = 1, header = TRUE)))
 # influence reputation network
@@ -81,8 +97,11 @@ climate2 <- ergm(clim2.rep ~
 summary(climate2)
 ```
 
+### Explore latent space models
 
 
+
+### What we've learned 
 
 
 
