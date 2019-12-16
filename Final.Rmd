@@ -1,0 +1,60 @@
+---
+title: "Final"
+author: "Devin Khosla"
+date: "12/14/2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library("network")
+library("sna")
+library("ergm")
+library("tergm")
+library("texreg")
+library("xergm")
+```
+
+```{r}
+clim1.rep <- network(as.matrix(read.csv2("Code/input/climate9500-rep.csv", row.names = 1, header = TRUE)))
+# influence reputation network
+clim1.collab <- network(as.matrix(read.csv2("Code/input/climate9500-collab.csv", row.names = 1, header = TRUE)))  
+# collaboration network
+set.vertex.attribute(clim1.rep, "bc-perc", betweenness(clim1.collab, rescale = TRUE))  
+# betweenness centrality as a vertex attribute
+clim1.dm <- read.csv2("Code/input/climate9500-dm.csv", row.names = 1, header = TRUE)
+set.vertex.attribute(clim1.rep, "dm", clim1.dm$dm)  # decision-maker?
+set.vertex.attribute(clim1.rep, "odeg-rep", degree(clim1.rep, cmode = "outdegree"))  
+# outdegree centrality as a vertex attribute
+com1 <- read.csv2("Code/input/climate9500-committee.csv", row.names = 1, header = TRUE)
+set.vertex.attribute(clim1.rep, "committees", rowSums(com1))
+# number of committee memberships as a vertex attribute
+```
+
+```{r}
+set.seed(12345)
+climate1 <- ergm(clim1.rep ~ 
+    edges + 
+    cyclicalties + 
+    transitiveties + 
+    mutual + 
+    nodeocov("odeg-rep") + 
+    edgecov(clim1.collab) + 
+    nodeicov("bc-perc") + 
+    nodeifactor("dm") + 
+    nodeicov("committees"), 
+    control = control.ergm(seed = 12345)
+) 
+summary(climate1)
+```
+
+
+
+
+
+
+
+
+
+
+
