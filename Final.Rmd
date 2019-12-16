@@ -33,7 +33,7 @@ set.vertex.attribute(clim1.rep, "committees", rowSums(com1))
 # number of committee memberships as a vertex attribute
 ```
 
-```{r}
+```{r, message=FALSE}
 climate1 <- ergm(clim1.rep ~ 
     edges + 
     cyclicalties + 
@@ -49,7 +49,7 @@ climate1 <- ergm(clim1.rep ~
 summary(climate1)
 ```
 
-```{r}
+```{r, message=FALSE}
 clim2.rep <- network(as.matrix(read.csv2("data/input/climate0205-rep.csv", row.names = 1, header = TRUE)))
 # influence reputation network
 clim2.collab <- network(as.matrix(read.csv2("data/input/climate0205-collab.csv", row.names = 1, header = TRUE)))
@@ -65,7 +65,7 @@ set.vertex.attribute(clim2.rep, "committees-2", rowSums(com2))
 # number of committee memberships as a vertex attribute
 ```
 
-```{r}
+```{r, message=FALSE}
 climate2 <- ergm(clim2.rep ~ 
     edges + 
     cyclicalties + 
