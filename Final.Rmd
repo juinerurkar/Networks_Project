@@ -15,6 +15,8 @@ library("texreg")
 library("xergm")
 ```
 
+### Introduction
+For this project we are reproducing a 
 ```{r}
 clim1.rep <- network(as.matrix(read.csv2("data/input/climate9500-rep.csv", row.names = 1, header = TRUE)))
 # influence reputation network
