@@ -47,7 +47,37 @@ climate1 <- ergm(clim1.rep ~
 summary(climate1)
 ```
 
+```{r}
+clim2.rep <- network(as.matrix(read.csv2("data/input/climate0205-rep.csv", row.names = 1, header = TRUE)))
+# influence reputation network
+clim2.collab <- network(as.matrix(read.csv2("data/input/climate0205-collab.csv", row.names = 1, header = TRUE)))
+# collaboration network
+set.vertex.attribute(clim2.rep, "bc-perc-2", 100 * betweenness(clim2.collab, rescale = TRUE))  
+# betweenness centrality as a vertex attribute
+clim2.dm <- read.csv2("data/input/climate0205-dm.csv", row.names = 1, header = TRUE)
+set.vertex.attribute(clim2.rep, "dm", clim2.dm$dm)  # decision-maker?
+set.vertex.attribute(clim2.rep, "odeg-rep", degree(clim2.rep, cmode = "outdegree"))  
+# outdegree centrality as a vertex attribute
+com2 <- read.csv2("data/input/climate0205-committee.csv", row.names = 1, header = TRUE)
+set.vertex.attribute(clim2.rep, "committees-2", rowSums(com2))
+# number of committee memberships as a vertex attribute
+```
 
+```{r}
+climate2 <- ergm(clim2.rep ~ 
+    edges + 
+    cyclicalties + 
+    transitiveties + 
+    mutual + 
+    nodeocov("odeg-rep") + 
+    edgecov(clim2.collab) + 
+    nodeicov("bc-perc-2") + 
+    nodeifactor("dm") + 
+    nodeicov("committees-2"), 
+    control = control.ergm(seed = 12345)
+)
+summary(climate2)
+```
 
 
 
