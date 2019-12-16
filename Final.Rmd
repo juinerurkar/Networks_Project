@@ -2,7 +2,7 @@
 title: "A reproducibility study of structural and institutional determinants of influence and reputation"
 author: "Devin Khosla, Jenny Liu, & Jui Nerurkar"
 date: "12/16/2019"
-output: pdf_document
+output: html_document
 ---
 
 ```{r setup, include=FALSE}
@@ -16,7 +16,7 @@ library("xergm")
 ```
 
 ### Introduction
-For this project we are reproducing a 
+For this project we are reproducing results from Ingold and Leifeld (2016), titled 'Structural and Institutional Determinants of Influence and Reputation: A Comparison of Collaborative and Adversarial Policy Networks in Decision Making and Implementation` from the Journal of Public Administration Research and Theory. T
 ```{r}
 clim1.rep <- network(as.matrix(read.csv2("data/input/climate9500-rep.csv", row.names = 1, header = TRUE)))
 # influence reputation network
