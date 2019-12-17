@@ -2,8 +2,33 @@
 title: "Network_Jui"
 author: "Nerurkar Jui A"
 date: "12/14/2019"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
+
+Introduction: (still editing)
+
+Effective and efficient policy making outcomes are strongly dependent on the negotiations and structures during the decision-making process. A primary assumption in the literature on collaborative and policy networks is that political outcomes are affected by a variety of state and non state actors. Past research about policy making aims at understanding how policy solutions are designed to resolve problems at the crucial agenda-setting stage and they attribute a strong role to ‘powerful’ actors in it (Ferris et al. 2007; Watkins and Rosengrant 1996).
+
+The definition of power of the actors involved in the decision making process depends on whether policy making is considered as a process shaped by elected officials and senior public managers or rather by a variety of interdependent private and public actors (Montjoy and Watson 1995; Svara 1998). Whereas the first can be understood as institutional power defined by formal rules, the second can be characterized as informal structural power or access to political influence. 
+
+In empirical policy networks, the two modes of power - formal power derived from institutional roles and structural power derived from network configurations - cannot be easily disentangled. Past studies highlight that integrating both institutional and structural resources into one statistical network model would help to understand the complexity of resource dependent and power (im)balance.
+
+The authors provide a structural and institutional explanation for power differentials in policy networks and further ask what impact structural versus formal power has on the formation of policy outputs and outcomes. Hence, their research question is: what factors determine the influence reputation of political actors? 
+
+To answer this question, they sought to investigate an antecedent condition for factual political influence and success: the reputation of an actor as being influential. They define reputation as the perceived importance of actors when evaluated by their peers or other stakeholders involved in the policy making process. The underlying assumption is that actors who have a reputation for being influential can considerably influence collective decision making. With the goal of understanding structural determinants of resources and power, they delve into two different branches of research: policy networks and collaborative networks research.
+
+Policy networks are defined as a set of relatively stable relationships which are of a nonhierarchical and interdependent nature and link a variety of public and private actors who share common interests with regard to a specific policy (Borzel 1997, Peterson and Bomberg 2009). On the other hand, collaborative networks conceptualize decision making and implementation as a cooperative game for the common cause of policy coordination - a game during which cooperation often breaks down due to collective action problems(Ingold and Leifeld 2016). The authors follow the argument that once ties are established, they become resources and that a strategy to build better reputation is to tactically select collaboration partners to ensure that many other actors can observe the strategic role the actor is playing in the policy network. Thus, the authors posit that ‘reputation has a systemic component’ and that ‘political actors strive to occupy network positions from where they can control resource or information flows through the network, and this is rewarded by gaining a greater reputational power.’
+
+The authors mention three important hypotheses in the paper, which are as follows:
+
+- The higher the betweenness centrality of alter in a collaboration or contact network, the more likely ego is to report alter as being particularly influential.
+
+- Collaboration between ego and alter leads ego to report alter as being particularly influential.
+
+- Actors with institutional decision making power tend to be perceived as particularly influential by other actors, irrespective of their structural position in the policy network.
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -21,46 +46,47 @@ library(latentnet)
 
 ```{r}
 # data preparation
-rep.1 <- read.csv2("climate9500-rep.csv", row.names = 1, 
+rep.1 <- read.csv2("input/climate9500-rep.csv", row.names = 1, 
     header = TRUE)
 rep.1 <- network(as.matrix(rep.1))  # influence reputation network
-collab.1 <- read.csv2("climate9500-collab.csv", row.names = 1, 
+collab.1 <- read.csv2("input/climate9500-collab.csv", row.names = 1, 
     header = TRUE)
 collab.1 <- network(as.matrix(collab.1))  # collaboration network
-set.vertex.attribute(rep.1, "bc-perc", 100 * betweenness(collab.1, 
+
+network::set.vertex.attribute(rep.1, "bc-perc", 100 * betweenness(collab.1, 
     rescale = TRUE))  # betweenness centrality as a vertex attribute
-dm.1 <- read.csv2("climate9500-dm.csv", row.names = 1, header = TRUE)
-set.vertex.attribute(rep.1, "dm", dm.1$dm)  # decision-maker?
-set.vertex.attribute(rep.1, "odeg-rep", degree(rep.1, 
+
+dm.1 <- read.csv2("input/climate9500-dm.csv", row.names = 1, header = TRUE)
+network::set.vertex.attribute(rep.1, "dm", dm.1$dm)  # decision-maker?
+network::set.vertex.attribute(rep.1, "odeg-rep", degree(rep.1, 
     cmode = "outdegree"))  # outdegree centrality as a vertex attribute
-com.1 <- read.csv2("climate9500-committee.csv", row.names = 1, 
+com.1 <- read.csv2("input/climate9500-committee.csv", row.names = 1, 
     header = TRUE)
-set.vertex.attribute(rep.1, "committees", rowSums(com.1))
+network::set.vertex.attribute(rep.1, "committees", rowSums(com.1))
     # number of committee memberships as a vertex attribute
 
 # save summary table for the appendix
 names.1 <- get.vertex.attribute(rep.1, "vertex.names")
 between_collab.1 <- 100 * betweenness(collab.1, rescale = TRUE)
 committee.1 <- rowSums(com.1)
-type.1 <- read.csv2("climate9500-type.csv", row.names = 1, 
+type.1 <- read.csv2("input/climate9500-type.csv", row.names = 1, 
     header = TRUE)
 appendix.1 <- data.frame(org = names.1, type3 = type.1[, 1], 
     type5 = type.1[, 2], committees = committee.1, dm = dm.1$dm, 
     betweenness = between_collab.1)
 
 # ERGM
-set.seed(12345)
+#set.seed(12345)
 climate1 <- ergm(rep.1 ~ edges + cyclicalties + transitiveties + mutual + nodeocov("odeg-rep") + edgecov(collab.1) + nodeicov("bc-perc") + nodeifactor("dm") + nodeicov("committees"),control = control.ergm(seed = 12345)
 )  # ERGM (model 1)
 summary(climate1)
-
 ```
 
 ```{r}
 #LSM (model 1)
 # Check evidence for clustering, fit a set of candidate models
 fits.1 <-lapply(1:2, function(G){
-    ergmm(rep.1 ~ euclidean(d=2, G=G) + nodeocov("odeg-rep") + edgecov(collab.1) + nodeicov("bc-perc") + nodeifactor("dm") + nodeicov("committees"), seed = 12345)
+    ergmm(rep.1 ~ euclidean(d=2, G=G) + edges + nodeocov("odeg-rep") + edgecov(collab.1) + nodeicov("bc-perc") + nodeifactor("dm") + nodeicov("committees"), seed = 12345)
   })
 
 # Compute the BICs
@@ -68,7 +94,7 @@ do.call(rbind,lapply(lapply(fits.1 ,bic.ergmm),as.data.frame))
 ```
 
 ```{r}
-clim.lsm.1 <- latentnet::ergmm(rep.1 ~ euclidean(d=2, G = 2) + nodeocov("odeg-rep") + edgecov(collab.1) + nodeicov("bc-perc") + nodeifactor("dm") + nodeicov("committees"), seed = 12345)
+clim.lsm.1 <- latentnet::ergmm(rep.1 ~ euclidean(d=2, G = 2) + edges + nodeocov("odeg-rep") + edgecov(collab.1) + nodeicov("bc-perc") + nodeifactor("dm") + nodeicov("committees"), seed = 12345)
 summary(clim.lsm.1)
 plot(clim.lsm.1, cluster.col = c("blue", "red"))
 ```
@@ -82,15 +108,15 @@ rep.2 <- network(as.matrix(rep.2))  # influence reputation network
 collab.2 <- read.csv2("input/climate0205-collab.csv", row.names = 1, 
     header = TRUE)
 collab.2 <- network(as.matrix(collab.2))  # collaboration network
-set.vertex.attribute(rep.2, "bc-perc-2", 100 * betweenness(collab.2, 
+network::set.vertex.attribute(rep.2, "bc-perc-2", 100 * betweenness(collab.2, 
     rescale = TRUE))  # betweenness centrality as a vertex attribute
 dm.2 <- read.csv2("input/climate0205-dm.csv", row.names = 1, header = TRUE)
-set.vertex.attribute(rep.2, "dm", dm.2$dm)  # decision-maker?
-set.vertex.attribute(rep.2, "odeg-rep", degree(rep.2, 
+network::set.vertex.attribute(rep.2, "dm", dm.2$dm)  # decision-maker?
+network::set.vertex.attribute(rep.2, "odeg-rep", degree(rep.2, 
     cmode = "outdegree"))  # outdegree centrality as a vertex attribute
 com.2 <- read.csv2("input/climate0205-committee.csv", row.names = 1, 
     header = TRUE)
-set.vertex.attribute(rep.2, "committees-2", rowSums(com.2))
+network::set.vertex.attribute(rep.2, "committees-2", rowSums(com.2))
     # number of committee memberships as a vertex attribute
 
 # save summary table for the appendix
@@ -114,7 +140,7 @@ summary(climate2)
 #LSM (model 2)
 # Check evidence for clustering, fit a set of candidate models
 fits.2 <-lapply(1:2, function(G){
-    ergmm(rep.2 ~ euclidean(d=2, G=G) + nodeocov("odeg-rep") + edgecov(collab.2) + nodeicov("bc-perc-2") + nodeifactor("dm") + nodeicov("committees-2"), seed = 12345)
+    ergmm(rep.2 ~ euclidean(d=2, G=G) + edges + nodeocov("odeg-rep") + edgecov(collab.2) + nodeicov("bc-perc-2") + nodeifactor("dm") + nodeicov("committees-2"), seed = 12345)
   })
 
 # Compute the BICs
@@ -122,7 +148,7 @@ do.call(rbind,lapply(lapply(fits.2 ,bic.ergmm),as.data.frame))
 ```
 
 ```{r}
-clim.lsm.2 <- ergmm(rep.2 ~ euclidean(d=2, G=2) + nodeocov("odeg-rep") + edgecov(collab.2) + nodeicov("bc-perc-2") + nodeifactor("dm") + nodeicov("committees-2"), seed = 12345)
+clim.lsm.2 <- ergmm(rep.2 ~ euclidean(d=2, G=2) + edges + nodeocov("odeg-rep") + edgecov(collab.2) + nodeicov("bc-perc-2") + nodeifactor("dm") + nodeicov("committees-2"), seed = 12345)
 summary(clim.lsm.2)
 plot(clim.lsm.2)
 ```
