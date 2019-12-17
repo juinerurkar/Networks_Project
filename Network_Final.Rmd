@@ -37,14 +37,6 @@ The authors mention three important hypotheses in the paper, which are as follow
 	
 	In both cases, the respondents were asked similar questions. The first question asked to the respondents was which other organizations, their organization perceived as influential. These responses were converted into a sociomatrix with senders on the rows and receivers on the columns. This sociomatrix describes the hierarchical organization of the network. To capture the structural organization, the respondents were asked which other organizations they collaborated with through the process. Since collaboration is intuitively undirected, any missing data was filled in with this assumption. Another variable collected was a binary variable describing whether an actor has any decision making power or not. 
 
-# Model 1: Climate Change first period
-
-# Model 2: Climate Change second period
-
-# Model 3: Telecommunications
-
-# Conclusion
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -56,9 +48,11 @@ library("ergm")
 library("tergm")   
 library("texreg")
 library(latentnet)
-
 ```
 
+# Model 1: Climate Change first period
+
+#Data
 ```{r}
 # data preparation
 rep.1 <- read.csv2("input/climate9500-rep.csv", row.names = 1, 
@@ -90,15 +84,19 @@ appendix.1 <- data.frame(org = names.1, type3 = type.1[, 1],
     type5 = type.1[, 2], committees = committee.1, dm = dm.1$dm, 
     betweenness = between_collab.1)
 
-# ERGM
-#set.seed(12345)
+```
+
+#ERGM
+
+```{r}
 climate1 <- ergm(rep.1 ~ edges + cyclicalties + transitiveties + mutual + nodeocov("odeg-rep") + edgecov(collab.1) + nodeicov("bc-perc") + nodeifactor("dm") + nodeicov("committees"),control = control.ergm(seed = 12345)
 )  # ERGM (model 1)
 summary(climate1)
 ```
 
+#Latent Space Model
+
 ```{r}
-#LSM (model 1)
 # Check evidence for clustering, fit a set of candidate models
 fits.1 <-lapply(1:2, function(G){
     ergmm(rep.1 ~ euclidean(d=2, G=G) + edges + nodeocov("odeg-rep") + edgecov(collab.1) + nodeicov("bc-perc") + nodeifactor("dm") + nodeicov("committees"), seed = 12345)
@@ -106,6 +104,8 @@ fits.1 <-lapply(1:2, function(G){
 
 # Compute the BICs
 do.call(rbind,lapply(lapply(fits.1 ,bic.ergmm),as.data.frame))
+
+#Model with two clusters has the lowest overall BIC.
 ```
 
 ```{r}
@@ -123,6 +123,9 @@ The authors also include the term reciprocity in the ergm "to control for the po
 The outdegree centrality of ego (nodeocov.odeg-rep) controls for the number of judgments that ego makes in the whole network. In other words, this term controls for the individual baseline propensities of individuals in any dyad towards making positive or negative judgments. This term is positive and significant in both the models. 
 
 
+# Model 2: Climate Change second period
+
+#Data
 ```{r}
 # data preparation
 rep.2 <- read.csv2("input/climate0205-rep.csv", row.names = 1, 
@@ -151,13 +154,15 @@ type.2 <- read.csv2("input/climate0205-type.csv", row.names = 1,
 appendix.2 <- data.frame(org = names.2, type3 = type.2[, 1], 
     type5 = type.2[, 2], committees = committee.2, dm = dm.2$dm, 
     betweenness = between_collab.2)
-
+```
 
 # ERGM
-set.seed(12345)
+```{r}
 climate2 <- ergm(rep.2 ~ edges + cyclicalties + transitiveties + mutual + nodeocov("odeg-rep") + edgecov(collab.2) + nodeicov("bc-perc-2") + nodeifactor("dm") + nodeicov("committees-2"), control = control.ergm(seed = 12345))  # ERGM (model 2)
 summary(climate2)
 ```
+
+#Latent Space Model
 
 ```{r}
 #LSM (model 2)
@@ -168,6 +173,8 @@ fits.2 <-lapply(1:2, function(G){
 
 # Compute the BICs
 do.call(rbind,lapply(lapply(fits.2 ,bic.ergmm),as.data.frame))
+
+#Model with two clusters has the lowest overall BIC.
 ```
 
 ```{r}
@@ -176,8 +183,9 @@ summary(clim.lsm.2)
 plot(clim.lsm.2)
 ```
 
-##Telecommunications
+# Model 3: Telecommunications
 
+#Data
 ```{r}
 # data preparation
 rep.3 <- read.csv2("input/telecom-rep.csv", row.names = 1, header = TRUE)
@@ -215,5 +223,8 @@ appendix.3 <- data.frame(org = names.3, type3 = type.3[, 1],
     type5 = type.3[, 2], committees = committee.3, 
     dm = dm.3$dm, betweenness = between_collab.3)
 ```
+
+
+# Conclusion
 
 
