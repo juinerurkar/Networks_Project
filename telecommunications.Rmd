@@ -1,0 +1,78 @@
+---
+title: "Telecommunications"
+date: "12/16/2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE, echo=TRUE}
+knitr::opts_chunk$set(echo = TRUE)
+library(network)
+library(sna)
+library(ergm)
+library(tergm)
+library(texreg)
+library(xergm)
+library(igraph)
+```
+
+### Visuals
+
+#### Climate 1 (Swiss)
+```{r}
+climate1_reputation <- read.csv2("data/input/climate9500-rep.csv", row.names = 1, header = TRUE)
+climate1_repitation <- network(as.matrix(climate1_reputation))  # influence reputation network
+climate1_collab <- read.csv2("data/input/climate9500-collab.csv", row.names = 1, header = TRUE)
+climate1_collab <- network(as.matrix(climate1_collab))  
+```
+
+```{r}
+par(mfrow=c(1,2))
+plot(igraph::graph_from_adjacency_matrix(as.matrix(climate1_reputation)), main = "Influence Reputation Network - Climate 1") # influence 
+plot(igraph::graph_from_adjacency_matrix(as.matrix(climate1_collab)), main = "Collaboration - Climate 1") #collaboration 
+```
+
+#### Climate 2 
+```{r}
+climate2_reputation <- read.csv2("data/input/climate0205-rep.csv", row.names = 1, header = TRUE)
+climate2_reputation <- network(as.matrix(climate2_reputation))  # influence reputation network
+climate2_collab <- read.csv2("data/input/climate0205-collab.csv", row.names = 1, header = TRUE)
+climate2_collab <- network(as.matrix(climate2_collab))  # collaboration network
+```
+
+```{r}
+par(mfrow=c(1,2))
+plot(igraph::graph_from_adjacency_matrix(as.matrix(climate2_reputation)), main = "Influence Reputation Network - Climate 2") # influence 
+plot(igraph::graph_from_adjacency_matrix(as.matrix(climate2_collab)), main = "Collaboration - Climate 2") #collaboration 
+```
+
+
+#### Telecommunications network 
+```{r, echo = FALSE}
+tele_reputation <- read.csv2("data/input/telecom-rep.csv", row.names = 1, header = TRUE)
+tele_reputation <- network(as.matrix(tele_reputation))  # influence reputation network
+```
+
+```{r}
+tele_collab <- read.csv2("data/input/telecom-collab.csv", row.names = 1, header = TRUE)
+### Fill in missing data
+for (i in 1:nrow(tele_collab)) {
+  for (j in 1:ncol(tele_collab)) {
+    if (is.na(tele_collab[i, j])) {
+      tele_collab[i, j] <- tele_collab[j, i]
+    }
+    if (is.na(tele_collab[i, j])) {  # if both ij and ji are missing then there is no tie
+      tele_collab[i, j] <- 0
+    }
+  }
+}
+```
+
+#### Telecommunications network 
+
+In the influence 
+```{r}
+par(mfrow=c(1,2))
+plot(igraph::graph_from_adjacency_matrix(as.matrix(tele_reputation)), main = "Influence Reputaion Network - Telecommunications") # influence 
+plot(igraph::graph_from_adjacency_matrix(as.matrix(tele_collab)), main = "Collaboration - Telecommunications") #collaboration 
+```
+

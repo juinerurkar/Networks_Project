@@ -1,0 +1,110 @@
+---
+title: "A reproducibility study of structural and institutional determinants of influence and reputation"
+author: "Devin Khosla, Jenny Liu, & Jui Nerurkar"
+date: "12/16/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library("network")
+library("sna")
+library("ergm")
+library("tergm")
+library("texreg")
+library("xergm")
+```
+
+### Introduction
+(give background as to what we are doing )
+For this project we are reproducing results from Ingold and Leifeld (2016), titled 'Structural and Institutional Determinants of Influence and Reputation: A Comparison of Collaborative and Adversarial Policy Networks in Decision Making and Implementation` from the Journal of Public Administration Research and Theory. T 
+
+(what are the authors proposing)
+
+### Data
+(describe the data we have)
+
+
+### Visuals 
+(make some plots of the networks)
+
+
+
+### Models 
+(code and explain what's going on and what the covariates explain etc and how that relates to the research question proposing)
+
+```{r}
+clim1.rep <- network(as.matrix(read.csv2("data/input/climate9500-rep.csv", row.names = 1, header = TRUE)))
+# influence reputation network
+clim1.collab <- network(as.matrix(read.csv2("data/input/climate9500-collab.csv", row.names = 1, header = TRUE)))  
+# collaboration network
+set.vertex.attribute(clim1.rep, "bc-perc", betweenness(clim1.collab, rescale = TRUE))  
+# betweenness centrality as a vertex attribute
+clim1.dm <- read.csv2("data/input/climate9500-dm.csv", row.names = 1, header = TRUE)
+set.vertex.attribute(clim1.rep, "dm", clim1.dm$dm)  # decision-maker?
+set.vertex.attribute(clim1.rep, "odeg-rep", degree(clim1.rep, cmode = "outdegree"))  
+# outdegree centrality as a vertex attribute
+com1 <- read.csv2("data/input/climate9500-committee.csv", row.names = 1, header = TRUE)
+set.vertex.attribute(clim1.rep, "committees", rowSums(com1))
+# number of committee memberships as a vertex attribute
+```
+
+```{r, message=FALSE}
+climate1 <- ergm(clim1.rep ~ 
+    edges + 
+    cyclicalties + 
+    transitiveties + 
+    mutual + 
+    nodeocov("odeg-rep") + 
+    edgecov(clim1.collab) + 
+    nodeicov("bc-perc") + 
+    nodeifactor("dm") + 
+    nodeicov("committees"), 
+    control = control.ergm(seed = 12345)
+) 
+summary(climate1)
+```
+
+```{r, message=FALSE}
+clim2.rep <- network(as.matrix(read.csv2("data/input/climate0205-rep.csv", row.names = 1, header = TRUE)))
+# influence reputation network
+clim2.collab <- network(as.matrix(read.csv2("data/input/climate0205-collab.csv", row.names = 1, header = TRUE)))
+# collaboration network
+set.vertex.attribute(clim2.rep, "bc-perc-2", 100 * betweenness(clim2.collab, rescale = TRUE))  
+# betweenness centrality as a vertex attribute
+clim2.dm <- read.csv2("data/input/climate0205-dm.csv", row.names = 1, header = TRUE)
+set.vertex.attribute(clim2.rep, "dm", clim2.dm$dm)  # decision-maker?
+set.vertex.attribute(clim2.rep, "odeg-rep", degree(clim2.rep, cmode = "outdegree"))  
+# outdegree centrality as a vertex attribute
+com2 <- read.csv2("data/input/climate0205-committee.csv", row.names = 1, header = TRUE)
+set.vertex.attribute(clim2.rep, "committees-2", rowSums(com2))
+# number of committee memberships as a vertex attribute
+```
+
+```{r, message=FALSE}
+climate2 <- ergm(clim2.rep ~ 
+    edges + 
+    cyclicalties + 
+    transitiveties + 
+    mutual + 
+    nodeocov("odeg-rep") + 
+    edgecov(clim2.collab) + 
+    nodeicov("bc-perc-2") + 
+    nodeifactor("dm") + 
+    nodeicov("committees-2"), 
+    control = control.ergm(seed = 12345)
+)
+summary(climate2)
+```
+
+### Explore latent space models
+
+
+
+### What we've learned 
+
+
+
+
+
+
