@@ -169,4 +169,44 @@ summary(clim.lsm.2)
 plot(clim.lsm.2)
 ```
 
+##Telecommunications
+
+```{r}
+# data preparation
+rep.3 <- read.csv2("input/telecom-rep.csv", row.names = 1, header = TRUE)
+rep.3 <- network(as.matrix(rep.3))  # influence reputation network
+collab.3 <- read.csv2("input/telecom-collab.csv", row.names = 1, 
+    header = TRUE)
+for (i in 1:nrow(collab.3)) {
+  for (j in 1:ncol(collab.3)) {
+    if (is.na(collab.3[i, j])) {
+      collab.3[i, j] <- collab.3[j, i]
+    }
+    if (is.na(collab.3[i, j])) {  # i.e., both ij and ji are missing
+      collab.3[i, j] <- 0
+    }
+  }
+}
+collab.3 <- network(collab.3)  # collaboration network
+network::set.vertex.attribute(rep.3, "bc-perc-3", 100 * betweenness(collab.3, 
+    rescale = TRUE))  # betweenness centrality as a vertex attribute
+dm.3 <- read.csv2("input/telecom-dm.csv", row.names = 1, header = TRUE)
+network::set.vertex.attribute(rep.3, "dm", dm.3$dm)  # decision-maker?
+network::set.vertex.attribute(rep.3, "odeg-rep", degree(rep.3, 
+    cmode = "outdegree"))  # outdegree centrality as a vertex attribute
+committee.3 <- rowSums(read.csv2("input/telecom-committee.csv", 
+    row.names = 1, header = TRUE))
+network::set.vertex.attribute(rep.3, "committees-3", committee.3)
+    # number of committee memberships as a vertex attribute
+
+# save summary table for the appendix
+names.3 <- get.vertex.attribute(rep.3, "vertex.names")
+between_collab.3 <- 100 * betweenness(collab.3, rescale = TRUE)
+type.3 <- read.csv2("input/telecom-type.csv", row.names = 1, 
+    header = TRUE)
+appendix.3 <- data.frame(org = names.3, type3 = type.3[, 1], 
+    type5 = type.3[, 2], committees = committee.3, 
+    dm = dm.3$dm, betweenness = between_collab.3)
+```
+
 
