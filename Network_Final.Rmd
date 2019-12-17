@@ -37,6 +37,13 @@ The authors mention three important hypotheses in the paper, which are as follow
 	
 	In both cases, the respondents were asked similar questions. The first question asked to the respondents was which other organizations, their organization perceived as influential. These responses were converted into a sociomatrix with senders on the rows and receivers on the columns. This sociomatrix describes the hierarchical organization of the network. To capture the structural organization, the respondents were asked which other organizations they collaborated with through the process. Since collaboration is intuitively undirected, any missing data was filled in with this assumption. Another variable collected was a binary variable describing whether an actor has any decision making power or not. 
 
+# Model 1: Climate Change first period
+
+# Model 2: Climate Change second period
+
+# Model 3: Telecommunications
+
+# Conclusion
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
