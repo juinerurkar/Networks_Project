@@ -99,6 +99,14 @@ summary(clim.lsm.1)
 plot(clim.lsm.1, cluster.col = c("blue", "red"))
 ```
 
+Results:
+
+The edges term is similar to a constant in linear regression models and it indicates the baseline likelihood of any dyad in the network to form a tie. This term is significant in the ergm as well as the latent space model. 
+The coefficient of cyclical ties is negative, which indicates an absence of cyclical ties. This supports the theory that influence reputation is a hierarchical and acyclic social phenomenon i.e if A rates B as influential and B rates C as influential, then it is unlikely that C will rate A as influential. This term is statistically significant.
+The coefficient for transitivity, which is a complementary effect that captures the hierarchical structure is positive and significant. However, in the paper this term is not statistically significant for this model.
+The authors also include the term reciprocity in the ergm "to control for the potential tendency of ties to be reciprocated in order to make sure that there are no omitted dependencies when we estimate our effects of interest." This term is positive but not statistically significant.  
+The outdegree centrality of ego (nodeocov.odeg-rep) controls for the number of judgments that ego makes in the whole network. In other words, this term controls for the individual baseline propensities of individuals in any dyad towards making positive or negative judgments. This term is positive and significant in both the models. 
+
 
 ```{r}
 # data preparation
