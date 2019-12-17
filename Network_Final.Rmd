@@ -1,0 +1,130 @@
+---
+title: "Network_Jui"
+author: "Nerurkar Jui A"
+date: "12/14/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library("network") 
+library("sna")     
+library("ergm")     
+library("tergm")   
+library("texreg")
+library(latentnet)
+
+```
+
+```{r}
+# data preparation
+rep.1 <- read.csv2("climate9500-rep.csv", row.names = 1, 
+    header = TRUE)
+rep.1 <- network(as.matrix(rep.1))  # influence reputation network
+collab.1 <- read.csv2("climate9500-collab.csv", row.names = 1, 
+    header = TRUE)
+collab.1 <- network(as.matrix(collab.1))  # collaboration network
+set.vertex.attribute(rep.1, "bc-perc", 100 * betweenness(collab.1, 
+    rescale = TRUE))  # betweenness centrality as a vertex attribute
+dm.1 <- read.csv2("climate9500-dm.csv", row.names = 1, header = TRUE)
+set.vertex.attribute(rep.1, "dm", dm.1$dm)  # decision-maker?
+set.vertex.attribute(rep.1, "odeg-rep", degree(rep.1, 
+    cmode = "outdegree"))  # outdegree centrality as a vertex attribute
+com.1 <- read.csv2("climate9500-committee.csv", row.names = 1, 
+    header = TRUE)
+set.vertex.attribute(rep.1, "committees", rowSums(com.1))
+    # number of committee memberships as a vertex attribute
+
+# save summary table for the appendix
+names.1 <- get.vertex.attribute(rep.1, "vertex.names")
+between_collab.1 <- 100 * betweenness(collab.1, rescale = TRUE)
+committee.1 <- rowSums(com.1)
+type.1 <- read.csv2("climate9500-type.csv", row.names = 1, 
+    header = TRUE)
+appendix.1 <- data.frame(org = names.1, type3 = type.1[, 1], 
+    type5 = type.1[, 2], committees = committee.1, dm = dm.1$dm, 
+    betweenness = between_collab.1)
+
+# ERGM
+set.seed(12345)
+climate1 <- ergm(rep.1 ~ edges + cyclicalties + transitiveties + mutual + nodeocov("odeg-rep") + edgecov(collab.1) + nodeicov("bc-perc") + nodeifactor("dm") + nodeicov("committees"),control = control.ergm(seed = 12345)
+)  # ERGM (model 1)
+summary(climate1)
+
+```
+
+```{r}
+#LSM (model 1)
+# Check evidence for clustering, fit a set of candidate models
+fits.1 <-lapply(1:2, function(G){
+    ergmm(rep.1 ~ euclidean(d=2, G=G) + nodeocov("odeg-rep") + edgecov(collab.1) + nodeicov("bc-perc") + nodeifactor("dm") + nodeicov("committees"), seed = 12345)
+  })
+
+# Compute the BICs
+do.call(rbind,lapply(lapply(fits.1 ,bic.ergmm),as.data.frame))
+```
+
+```{r}
+clim.lsm.1 <- latentnet::ergmm(rep.1 ~ euclidean(d=2, G = 2) + nodeocov("odeg-rep") + edgecov(collab.1) + nodeicov("bc-perc") + nodeifactor("dm") + nodeicov("committees"), seed = 12345)
+summary(clim.lsm.1)
+plot(clim.lsm.1, cluster.col = c("blue", "red"))
+```
+
+
+```{r}
+# data preparation
+rep.2 <- read.csv2("input/climate0205-rep.csv", row.names = 1, 
+    header = TRUE)
+rep.2 <- network(as.matrix(rep.2))  # influence reputation network
+collab.2 <- read.csv2("input/climate0205-collab.csv", row.names = 1, 
+    header = TRUE)
+collab.2 <- network(as.matrix(collab.2))  # collaboration network
+set.vertex.attribute(rep.2, "bc-perc-2", 100 * betweenness(collab.2, 
+    rescale = TRUE))  # betweenness centrality as a vertex attribute
+dm.2 <- read.csv2("input/climate0205-dm.csv", row.names = 1, header = TRUE)
+set.vertex.attribute(rep.2, "dm", dm.2$dm)  # decision-maker?
+set.vertex.attribute(rep.2, "odeg-rep", degree(rep.2, 
+    cmode = "outdegree"))  # outdegree centrality as a vertex attribute
+com.2 <- read.csv2("input/climate0205-committee.csv", row.names = 1, 
+    header = TRUE)
+set.vertex.attribute(rep.2, "committees-2", rowSums(com.2))
+    # number of committee memberships as a vertex attribute
+
+# save summary table for the appendix
+names.2 <- get.vertex.attribute(rep.2, "vertex.names")
+between_collab.2 <- 100 * betweenness(collab.2, rescale = TRUE)
+committee.2 <- rowSums(com.2)
+type.2 <- read.csv2("input/climate0205-type.csv", row.names = 1, 
+    header = TRUE)
+appendix.2 <- data.frame(org = names.2, type3 = type.2[, 1], 
+    type5 = type.2[, 2], committees = committee.2, dm = dm.2$dm, 
+    betweenness = between_collab.2)
+
+
+# ERGM
+set.seed(12345)
+climate2 <- ergm(rep.2 ~ edges + cyclicalties + transitiveties + mutual + nodeocov("odeg-rep") + edgecov(collab.2) + nodeicov("bc-perc-2") + nodeifactor("dm") + nodeicov("committees-2"), control = control.ergm(seed = 12345))  # ERGM (model 2)
+summary(climate2)
+```
+
+```{r}
+#LSM (model 2)
+# Check evidence for clustering, fit a set of candidate models
+fits.2 <-lapply(1:2, function(G){
+    ergmm(rep.2 ~ euclidean(d=2, G=G) + nodeocov("odeg-rep") + edgecov(collab.2) + nodeicov("bc-perc-2") + nodeifactor("dm") + nodeicov("committees-2"), seed = 12345)
+  })
+
+# Compute the BICs
+do.call(rbind,lapply(lapply(fits.2 ,bic.ergmm),as.data.frame))
+```
+
+```{r}
+clim.lsm.2 <- ergmm(rep.2 ~ euclidean(d=2, G=2) + nodeocov("odeg-rep") + edgecov(collab.2) + nodeicov("bc-perc-2") + nodeifactor("dm") + nodeicov("committees-2"), seed = 12345)
+summary(clim.lsm.2)
+plot(clim.lsm.2)
+```
+
+
