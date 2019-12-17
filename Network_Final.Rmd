@@ -7,7 +7,7 @@ output:
   html_document: default
 ---
 
-Introduction: (still editing)
+# Introduction: (still editing)
 
 Effective and efficient policy making outcomes are strongly dependent on the negotiations and structures during the decision-making process. A primary assumption in the literature on collaborative and policy networks is that political outcomes are affected by a variety of state and non state actors. Past research about policy making aims at understanding how policy solutions are designed to resolve problems at the crucial agenda-setting stage and they attribute a strong role to ‘powerful’ actors in it (Ferris et al. 2007; Watkins and Rosengrant 1996).
 
@@ -28,6 +28,14 @@ The authors mention three important hypotheses in the paper, which are as follow
 - Collaboration between ego and alter leads ego to report alter as being particularly influential.
 
 - Actors with institutional decision making power tend to be perceived as particularly influential by other actors, irrespective of their structural position in the policy network.
+
+# Data
+
+	The first analysis we choose to do concerns the climate change policy in Switzerland. This policy was at the national level and the data was collected during the decision making stage of the process. The main goal of the policy was to mitigate the emissions of green house gases by 10% by 2012. The data was collected at two stages, the first is at the launch of the policy and the second was when a major amendment to the policy was being decided upon. There were interviews conducted with 33 organizations involved with this legislation. The response rate was 100% and the final network included 4 government actors, 5 political parties, 11 organized interest parties, and 13 scientific, research or ecological parties. 
+	
+	The second analysis we choose to examine further is the Switzerland telecommunications data. This example, focuses on the actual implementation of a policy. The policy in question fully liberalized the Swiss telecommunications market. This time however, the surveys were conducted by post. The survey was sent out to 38 actors and with a 82% response rate. These included 14 government actors, 6 political parties, 13 private sector representatives and 5 trade unions. For both analysis, the data only included organizational actors as opposed to individuals. Furthermore, the actors in both cases were decided upon by a panel of experts and verified with the the respondents. 
+	
+	In both cases, the respondents were asked similar questions. The first question asked to the respondents was which other organizations, their organization perceived as influential. These responses were converted into a sociomatrix with senders on the rows and receivers on the columns. This sociomatrix describes the hierarchical organization of the network. To capture the structural organization, the respondents were asked which other organizations they collaborated with through the process. Since collaboration is intuitively undirected, any missing data was filled in with this assumption. Another variable collected was a binary variable describing whether an actor has any decision making power or not. 
 
 
 ```{r setup, include=FALSE}
