@@ -116,8 +116,8 @@ network::set.vertex.attribute(climate1_reputation, "committees", rowSums(com.1))
 
 #### ERGM
 ```{r, message = FALSE}
-climate1 <- ergm(climate1_reputation ~ edges + cyclicalties + transitiveties + mutual + nodeocov("odeg-rep") + edgecov(climate1_collab) + 
-                   nodeicov("bc-perc") + nodeifactor("dm") + nodeicov("committees"), 
+climate1 <- ergm(climate1_reputation ~ edges + cyclicalties + transitiveties + mutual + nodeocov("odeg-rep") +
+                   edgecov(climate1_collab) + nodeicov("bc-perc") + nodeifactor("dm") + nodeicov("committees"), 
                  control = control.ergm(seed = 12345))  # ERGM (model 1)
 summary(climate1)
 ```
@@ -126,7 +126,8 @@ summary(climate1)
 ```{r, message = FALSE}
 # Check evidence for clustering, fit a set of candidate models
 fits.1 <-lapply(1:2, function(G){
-    ergmm(climate1_reputation ~ euclidean(d=2, G=G) + edges + nodeocov("odeg-rep") + edgecov(climate1_collab) + nodeicov("bc-perc") + nodeifactor("dm") + nodeicov("committees"), seed = 12345)
+    ergmm(climate1_reputation ~ euclidean(d=2, G=G) + edges + nodeocov("odeg-rep") + edgecov(climate1_collab) +
+            nodeicov("bc-perc") + nodeifactor("dm") + nodeicov("committees"), seed = 12345)
   })
 
 # Compute the BICs
@@ -234,30 +235,44 @@ network::set.vertex.attribute(tele_reputation, "committees", tele_committee)
 telecommunication <- ergm(tele_reputation ~ edges + cyclicalties + transitiveties + mutual + nodeocov("odeg-rep") + 
                   edgecov(tele_collab) + nodeicov("bc-perc") + nodeifactor("dm") + nodeicov("committees"), 
                 control = control.ergm(seed = 12345))
-summary(telecommunication)
+tele_ergm <- summary(telecommunication)
+tele_ergm$coefs
 ```
 
 ```{r, message = FALSE}
 #LSM (telecommunications)
 # Check evidence for clustering, fit a set of candidate modelst
-tele.fit <-lapply(1:2, function(G){
-    ergmm(tele_reputation ~ euclidean(d=2, G=G) + edges + nodeocov("odeg-rep") + edgecov(tele_collab) +
-            nodeicov("bc-perc") + nodeifactor("dm") + nodeicov("committees"), seed = 12345)
+tele.fit <-lapply(1:4, function(G){
+    ergmm(tele_reputation ~ euclidean(d=2, G=2) + edges + cyclicalties + transitiveties + mutual +
+                    nodeocov("odeg-rep") + edgecov(tele_collab) + nodeicov("bc-perc") + nodeifactor("dm") +
+                    nodeicov("committees"), seed = 12345)
   })
 
 # Compute the BICs
-do.call(rbind,lapply(lapply(tele.fit ,bic.ergmm),as.data.frame))
+do.call(rbind, lapply(lapply(tele.fit, bic.ergmm), as.data.frame))
 
-#Model with two clusters has the lowest overall BIC.
+# Model with four clusters has the lowest overall BIC, however the BIC for two clusters has a similar BIC therefore we will choose the model with 2 clusters. 
 ```
 
 ```{r, message = FALSE}
-clim.lsm.2 <- ergmm(climate2_reputation ~ euclidean(d=2, G=2) + edges + nodeocov("odeg-rep") + edgecov(climate2_collab) + 
-                      nodeicov("bc-perc-2") + nodeifactor("dm") + nodeicov("committees-2"), seed = 12345)
-summary(clim.lsm.2)
-plot(clim.lsm.2)
+tele.lsm <- ergmm(tele_reputation ~ euclidean(d=2, G=2) + edges + cyclicalties + transitiveties + mutual +
+                    nodeocov("odeg-rep") + edgecov(tele_collab) + nodeicov("bc-perc") + nodeifactor("dm") +
+                    nodeicov("committees"),  seed = 12345)
+tele_ls_fit <- summary(tele.lsm)
+tele_ls_fit
+tele_ls_fit$mkl$beta
+plot(tele.lsm)
 ```
 
+```{r}
+telecom_coefs <- data.frame(coefficients = c("edges", "cyclical ties", "transitive ties", 
+                                             ""),
+                            ERGM = round(tele_ergm$coefs[,1],3),
+                            ERGM_pvalues = round(tele_ergm$coefs[,4],3),
+                            LSM = round(tele_ls_fit$pmean$coef.table[,1],3),
+                            LSM_pvalues = round(tele_ls_fit$pmean$coef.table[,4],3))
+telecom_coefs
+```
 
 
 
@@ -283,7 +298,7 @@ appendix.2 <- data.frame(org = names.2, type3 = type.2[, 1],
     type5 = type.2[, 2], committees = committee.2, dm = dm.2$dm, 
     betweenness = between_climate2_collab)
 
-# sTELECOMMUNICATIONS
+# TELECOMMUNICATIONS
 names.3 <- network::get.vertex.attribute(tele_reputation, "vertex.names")
 between_collab.3 <- 100 * sna::betweenness(tele_collab, rescale = TRUE)
 type.3 <- read.csv2("input/telecom-type.csv", row.names = 1, header = TRUE)
