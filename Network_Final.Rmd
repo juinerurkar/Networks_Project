@@ -47,7 +47,7 @@ library("sna")
 library("ergm")     
 library("tergm")   
 library("texreg")
-library(latentnet)
+library("latentnet")
 ```
 
 # Model 1: Climate Change first period
@@ -139,19 +139,19 @@ Lastly, the coefficient for term 'committees' is positive and significant in bot
 #Data
 ```{r}
 # data preparation
-rep.2 <- read.csv2("input/climate0205-rep.csv", row.names = 1, 
+rep.2 <- read.csv2("data/input/climate0205-rep.csv", row.names = 1, 
     header = TRUE)
 rep.2 <- network(as.matrix(rep.2))  # influence reputation network
-collab.2 <- read.csv2("input/climate0205-collab.csv", row.names = 1, 
+collab.2 <- read.csv2("data/input/climate0205-collab.csv", row.names = 1, 
     header = TRUE)
 collab.2 <- network(as.matrix(collab.2))  # collaboration network
 network::set.vertex.attribute(rep.2, "bc-perc-2", 100 * betweenness(collab.2, 
     rescale = TRUE))  # betweenness centrality as a vertex attribute
-dm.2 <- read.csv2("input/climate0205-dm.csv", row.names = 1, header = TRUE)
+dm.2 <- read.csv2("data/input/climate0205-dm.csv", row.names = 1, header = TRUE)
 network::set.vertex.attribute(rep.2, "dm", dm.2$dm)  # decision-maker?
 network::set.vertex.attribute(rep.2, "odeg-rep", degree(rep.2, 
     cmode = "outdegree"))  # outdegree centrality as a vertex attribute
-com.2 <- read.csv2("input/climate0205-committee.csv", row.names = 1, 
+com.2 <- read.csv2("data/input/climate0205-committee.csv", row.names = 1, 
     header = TRUE)
 network::set.vertex.attribute(rep.2, "committees-2", rowSums(com.2))
     # number of committee memberships as a vertex attribute
@@ -160,7 +160,7 @@ network::set.vertex.attribute(rep.2, "committees-2", rowSums(com.2))
 names.2 <- get.vertex.attribute(rep.2, "vertex.names")
 between_collab.2 <- 100 * betweenness(collab.2, rescale = TRUE)
 committee.2 <- rowSums(com.2)
-type.2 <- read.csv2("input/climate0205-type.csv", row.names = 1, 
+type.2 <- read.csv2("data/input/climate0205-type.csv", row.names = 1, 
     header = TRUE)
 appendix.2 <- data.frame(org = names.2, type3 = type.2[, 1], 
     type5 = type.2[, 2], committees = committee.2, dm = dm.2$dm, 
