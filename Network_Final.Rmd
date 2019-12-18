@@ -6,8 +6,19 @@ output:
   pdf_document: default
   html_document: default
 ---
+```{r setup, include=FALSE, messageFALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(tidy = TRUE)
+library(network) 
+library(sna)     
+library(ergm)     
+library(tergm)   
+library(texreg)
+library(latentnet)
+library(igraph)
+```
 
-# Introduction:
+## Introduction:
 
 Effective and efficient policy making outcomes are strongly dependent on the negotiations and structures during the decision-making process. A primary assumption in the literature on collaborative and policy networks is that political outcomes are affected by a variety of state and non state actors. Past research about policy making aims at understanding how policy solutions are designed to resolve problems at the crucial agenda-setting stage and they attribute a strong role to ‘powerful’ actors in it (Ferris et al. 2007; Watkins and Rosengrant 1996).
 
@@ -23,83 +34,98 @@ Policy networks are defined as a set of relatively stable relationships which ar
 
 The authors mention three important hypotheses in the paper, which are as follows:
 
-- The higher the betweenness centrality of alter in a collaboration or contact network, the more likely ego is to report alter as being particularly influential.
+1. The higher the betweenness centrality of alter in a collaboration or contact network, the more likely ego is to report alter as being particularly influential.
 
-- Collaboration between ego and alter leads ego to report alter as being particularly influential.
+2. Collaboration between ego and alter leads ego to report alter as being particularly influential.
 
-- Actors with institutional decision making power tend to be perceived as particularly influential by other actors, irrespective of their structural position in the policy network.
+3. Actors with institutional decision making power tend to be perceived as particularly influential by other actors, irrespective of their structural position in the policy network.
 
-# Data
+## Data
+Ingold and Leifeld (2016) looked a four different policy networks for this analysis at two different time points in policy cycle stage. For the the purposes of our project we will look both decision-making policy networks and collaborative implementation networks in Switzerland. 
 
-	The first analysis we choose to do concerns the climate change policy in Switzerland. This policy was at the national level and the data was collected during the decision making stage of the process. The main goal of the policy was to mitigate the emissions of green house gases by 10% by 2012. The data was collected at two stages, the first is at the launch of the policy and the second was when a major amendment to the policy was being decided upon. There were interviews conducted with 33 organizations involved with this legislation. The response rate was 100% and the final network included 4 government actors, 5 political parties, 11 organized interest parties, and 13 scientific, research or ecological parties. 
+The first analysis we choose to do concerns the climate change policy in Switzerland. This policy was at the national level and the data was collected during the decision making stage of the process. The main goal of the policy was to mitigate the emissions of green house gases by 10% by 2012. The data was collected at two stages, the first is at the launch of the policy and the second was when a major amendment to the policy was being decided upon. There were interviews conducted with 33 organizations involved with this legislation. The response rate was 100% and the final network included 4 government actors, 5 political parties, 11 organized interest parties, and 13 scientific, research or ecological parties. 
 	
-	The second analysis we choose to examine further is the Switzerland telecommunications data. This example, focuses on the actual implementation of a policy. The policy in question fully liberalized the Swiss telecommunications market. This time however, the surveys were conducted by post. The survey was sent out to 38 actors and with a 82% response rate. These included 14 government actors, 6 political parties, 13 private sector representatives and 5 trade unions. For both analysis, the data only included organizational actors as opposed to individuals. Furthermore, the actors in both cases were decided upon by a panel of experts and verified with the the respondents. 
-	
-	In both cases, the respondents were asked similar questions. The first question asked to the respondents was which other organizations, their organization perceived as influential. These responses were converted into a sociomatrix with senders on the rows and receivers on the columns. This sociomatrix describes the hierarchical organization of the network. To capture the structural organization, the respondents were asked which other organizations they collaborated with through the process. Since collaboration is intuitively undirected, any missing data was filled in with this assumption. Another variable collected was a binary variable describing whether an actor has any decision making power or not. 
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r}
+climate1_reputation <- read.csv2("data/input/climate9500-rep.csv", row.names = 1, header = TRUE)
+climate1_reputation <- network(as.matrix(climate1_reputation))  # influence reputation network
+climate1_collab <- read.csv2("data/input/climate9500-collab.csv", row.names = 1, header = TRUE)
+climate1_collab <- network(as.matrix(climate1_collab))  
 ```
 
 ```{r}
-library("network") 
-library("sna")     
-library("ergm")     
-library("tergm")   
-library("texreg")
-library("latentnet")
+plot(igraph::graph_from_adjacency_matrix(as.matrix(climate1_reputation)), main = "Influence Reputation Network - Climate 1") # influence 
+plot(igraph::graph_from_adjacency_matrix(as.matrix(climate1_collab)), main = "Collaboration - Climate 1") #collaboration 
 ```
 
-# Model 1: Climate Change first period
-
-#Data
 ```{r}
-# data preparation
-rep.1 <- read.csv2("input/climate9500-rep.csv", row.names = 1, 
-    header = TRUE)
-rep.1 <- network(as.matrix(rep.1))  # influence reputation network
-collab.1 <- read.csv2("input/climate9500-collab.csv", row.names = 1, 
-    header = TRUE)
-collab.1 <- network(as.matrix(collab.1))  # collaboration network
+climate2_reputation <- read.csv2("data/input/climate0205-rep.csv", row.names = 1, header = TRUE)
+climate2_reputation <- network(as.matrix(climate2_reputation))  # influence reputation network
+climate2_collab <- read.csv2("data/input/climate0205-collab.csv", row.names = 1, header = TRUE)
+climate2_collab <- network(as.matrix(climate2_collab))  # collaboration network
+```
 
-network::set.vertex.attribute(rep.1, "bc-perc", 100 * betweenness(collab.1, 
+```{r}
+plot(igraph::graph_from_adjacency_matrix(as.matrix(climate2_reputation)), main = "Influence Reputation Network - Climate 2") # influence 
+plot(igraph::graph_from_adjacency_matrix(as.matrix(climate2_collab)), main = "Collaboration - Climate 2") #collaboration 
+```
+
+The second analysis we choose to examine further is the Switzerland telecommunications data. This example, focuses on the actual implementation of a policy. The policy in question fully liberalized the Swiss telecommunications market. This time however, the surveys were conducted by post. The survey was sent out to 38 actors and with a 82% response rate. These included 14 government actors, 6 political parties, 13 private sector representatives and 5 trade unions. For both analysis, the data only included organizational actors as opposed to individuals. Furthermore, the actors in both cases were decided upon by a panel of experts and verified with the the respondents. 
+
+```{r, echo = FALSE}
+tele_reputation <- read.csv2("data/input/telecom-rep.csv", row.names = 1, header = TRUE)
+tele_reputation <- network(as.matrix(tele_reputation))  # influence reputation network
+```
+
+```{r}
+tele_collab <- read.csv2("data/input/telecom-collab.csv", row.names = 1, header = TRUE)
+### Fill in missing data
+for (i in 1:nrow(tele_collab)) {
+  for (j in 1:ncol(tele_collab)) {
+    if (is.na(tele_collab[i, j])) {
+      tele_collab[i, j] <- tele_collab[j, i]
+    }
+    if (is.na(tele_collab[i, j])) {  # if both ij and ji are missing then there is no tie
+      tele_collab[i, j] <- 0
+    }
+  }
+}
+```
+
+```{r}
+plot(igraph::graph_from_adjacency_matrix(as.matrix(tele_reputation)), main = "Influence Reputaion Network - Telecommunications") # influence 
+plot(igraph::graph_from_adjacency_matrix(as.matrix(tele_collab)), main = "Collaboration - Telecommunications") #collaboration 
+```
+
+In both cases, the respondents were asked similar questions. The first question asked to the respondents was which other organizations, their organization perceived as influential. These responses were converted into a sociomatrix with senders on the rows and receivers on the columns. This sociomatrix describes the hierarchical organization of the network. To capture the structural organization, the respondents were asked which other organizations they collaborated with through the process. Since collaboration is intuitively undirected, any missing data was filled in with this assumption. Another variable collected was a binary variable describing whether an actor has any decision making power or not. 
+
+### Network 1: Climate Policy Time 1 : 1995 - 2000 
+```{r}
+### Data for ERGM models 
+network::set.vertex.attribute(climate1_reputation, "bc-perc", 100 * sna::betweenness(climate1_collab, 
     rescale = TRUE))  # betweenness centrality as a vertex attribute
 
-dm.1 <- read.csv2("input/climate9500-dm.csv", row.names = 1, header = TRUE)
-network::set.vertex.attribute(rep.1, "dm", dm.1$dm)  # decision-maker?
-network::set.vertex.attribute(rep.1, "odeg-rep", degree(rep.1, 
+dm.1 <- read.csv2("data/input/climate9500-dm.csv", row.names = 1, header = TRUE)
+network::set.vertex.attribute(climate1_reputation, "dm", dm.1$dm)  # decision-maker?
+network::set.vertex.attribute(climate1_reputation, "odeg-rep", sna::degree(climate1_reputation, 
     cmode = "outdegree"))  # outdegree centrality as a vertex attribute
-com.1 <- read.csv2("input/climate9500-committee.csv", row.names = 1, 
-    header = TRUE)
-network::set.vertex.attribute(rep.1, "committees", rowSums(com.1))
+com.1 <- read.csv2("data/input/climate9500-committee.csv", row.names = 1, header = TRUE)
+network::set.vertex.attribute(climate1_reputation, "committees", rowSums(com.1))
     # number of committee memberships as a vertex attribute
-
-# save summary table for the appendix
-names.1 <- get.vertex.attribute(rep.1, "vertex.names")
-between_collab.1 <- 100 * betweenness(collab.1, rescale = TRUE)
-committee.1 <- rowSums(com.1)
-type.1 <- read.csv2("input/climate9500-type.csv", row.names = 1, 
-    header = TRUE)
-appendix.1 <- data.frame(org = names.1, type3 = type.1[, 1], 
-    type5 = type.1[, 2], committees = committee.1, dm = dm.1$dm, 
-    betweenness = between_collab.1)
-
 ```
 
-#ERGM
-
-```{r}
-climate1 <- ergm(rep.1 ~ edges + cyclicalties + transitiveties + mutual + nodeocov("odeg-rep") + edgecov(collab.1) + nodeicov("bc-perc") + nodeifactor("dm") + nodeicov("committees"),control = control.ergm(seed = 12345)
-)  # ERGM (model 1)
+#### ERGM
+```{r, message = FALSE}
+climate1 <- ergm(climate1_reputation ~ edges + cyclicalties + transitiveties + mutual + nodeocov("odeg-rep") + edgecov(climate1_collab) + 
+                   nodeicov("bc-perc") + nodeifactor("dm") + nodeicov("committees"), 
+                 control = control.ergm(seed = 12345))  # ERGM (model 1)
 summary(climate1)
 ```
 
-#Latent Space Model
-
-```{r}
+#### Latent Space Model
+```{r, message = FALSE}
 # Check evidence for clustering, fit a set of candidate models
 fits.1 <-lapply(1:2, function(G){
-    ergmm(rep.1 ~ euclidean(d=2, G=G) + edges + nodeocov("odeg-rep") + edgecov(collab.1) + nodeicov("bc-perc") + nodeifactor("dm") + nodeicov("committees"), seed = 12345)
+    ergmm(climate1_reputation ~ euclidean(d=2, G=G) + edges + nodeocov("odeg-rep") + edgecov(climate1_collab) + nodeicov("bc-perc") + nodeifactor("dm") + nodeicov("committees"), seed = 12345)
   })
 
 # Compute the BICs
@@ -108,8 +134,10 @@ do.call(rbind,lapply(lapply(fits.1 ,bic.ergmm),as.data.frame))
 #Model with two clusters has the lowest overall BIC.
 ```
 
-```{r}
-clim.lsm.1 <- latentnet::ergmm(rep.1 ~ euclidean(d=2, G = 2) + edges + nodeocov("odeg-rep") + edgecov(collab.1) + nodeicov("bc-perc") + nodeifactor("dm") + nodeicov("committees"), seed = 12345)
+```{r, message = FALSE}
+clim.lsm.1 <- latentnet::ergmm(climate1_reputation ~ euclidean(d=2, G = 2) + edges + nodeocov("odeg-rep") + 
+                                 edgecov(climate1_collab) + nodeicov("bc-perc") + nodeifactor("dm") + nodeicov("committees"), 
+                               seed = 12345)
 summary(clim.lsm.1)
 plot(clim.lsm.1, cluster.col = c("blue", "red"))
 ```
@@ -134,52 +162,31 @@ Along with the structural components, the authors also wanted to understand the 
 
 Lastly, the coefficient for term 'committees' is positive and significant in both the models. Hence, this implies that institutional integration of an actor via membership in policy committees significantly increases the likelihood of being rated as influential. 
 
-# Model 2: Climate Change second period
+### Network 1: Climate Policy Time 2 : 2002 - 2005 
 
-#Data
 ```{r}
-# data preparation
-rep.2 <- read.csv2("data/input/climate0205-rep.csv", row.names = 1, 
-    header = TRUE)
-rep.2 <- network(as.matrix(rep.2))  # influence reputation network
-collab.2 <- read.csv2("data/input/climate0205-collab.csv", row.names = 1, 
-    header = TRUE)
-collab.2 <- network(as.matrix(collab.2))  # collaboration network
-network::set.vertex.attribute(rep.2, "bc-perc-2", 100 * betweenness(collab.2, 
-    rescale = TRUE))  # betweenness centrality as a vertex attribute
+# Data prep for ERGMs 
+network::set.vertex.attribute(climate2_reputation, "bc-perc-2", 100 * sna::betweenness(climate2_collab, rescale = TRUE))  # betweenness centrality as a vertex attribute
 dm.2 <- read.csv2("data/input/climate0205-dm.csv", row.names = 1, header = TRUE)
-network::set.vertex.attribute(rep.2, "dm", dm.2$dm)  # decision-maker?
-network::set.vertex.attribute(rep.2, "odeg-rep", degree(rep.2, 
-    cmode = "outdegree"))  # outdegree centrality as a vertex attribute
-com.2 <- read.csv2("data/input/climate0205-committee.csv", row.names = 1, 
-    header = TRUE)
-network::set.vertex.attribute(rep.2, "committees-2", rowSums(com.2))
+network::set.vertex.attribute(climate2_reputation, "dm", dm.2$dm)  # decision-maker?
+network::set.vertex.attribute(climate2_reputation, "odeg-rep", sna::degree(climate2_reputation, cmode = "outdegree"))  # outdegree centrality as a vertex attribute
+com.2 <- read.csv2("data/input/climate0205-committee.csv", row.names = 1, header = TRUE)
+network::set.vertex.attribute(climate2_reputation, "committees-2", rowSums(com.2))
     # number of committee memberships as a vertex attribute
-
-# save summary table for the appendix
-names.2 <- get.vertex.attribute(rep.2, "vertex.names")
-between_collab.2 <- 100 * betweenness(collab.2, rescale = TRUE)
-committee.2 <- rowSums(com.2)
-type.2 <- read.csv2("data/input/climate0205-type.csv", row.names = 1, 
-    header = TRUE)
-appendix.2 <- data.frame(org = names.2, type3 = type.2[, 1], 
-    type5 = type.2[, 2], committees = committee.2, dm = dm.2$dm, 
-    betweenness = between_collab.2)
 ```
 
-# ERGM
-```{r}
-climate2 <- ergm(rep.2 ~ edges + cyclicalties + transitiveties + mutual + nodeocov("odeg-rep") + edgecov(collab.2) + nodeicov("bc-perc-2") + nodeifactor("dm") + nodeicov("committees-2"), control = control.ergm(seed = 12345))  # ERGM (model 2)
+#### ERGM
+```{r, message = FALSE}
+climate2 <- ergm(climate2_reputation ~ edges + cyclicalties + transitiveties + mutual + nodeocov("odeg-rep") + edgecov(climate2_collab) + nodeicov("bc-perc-2") + nodeifactor("dm") + nodeicov("committees-2"), control = control.ergm(seed = 12345))  # ERGM (model 2)
 summary(climate2)
 ```
 
-#Latent Space Model
-
-```{r}
+#### Latent Space Model
+```{r, message = FALSE}
 #LSM (model 2)
 # Check evidence for clustering, fit a set of candidate models
 fits.2 <-lapply(1:2, function(G){
-    ergmm(rep.2 ~ euclidean(d=2, G=G) + edges + nodeocov("odeg-rep") + edgecov(collab.2) + nodeicov("bc-perc-2") + nodeifactor("dm") + nodeicov("committees-2"), seed = 12345)
+    ergmm(climate2_reputation ~ euclidean(d=2, G=G) + edges + nodeocov("odeg-rep") + edgecov(climate2_collab) + nodeicov("bc-perc-2") + nodeifactor("dm") + nodeicov("committees-2"), seed = 12345)
   })
 
 # Compute the BICs
@@ -188,54 +195,46 @@ do.call(rbind,lapply(lapply(fits.2 ,bic.ergmm),as.data.frame))
 #Model with two clusters has the lowest overall BIC.
 ```
 
-```{r}
-clim.lsm.2 <- ergmm(rep.2 ~ euclidean(d=2, G=2) + edges + nodeocov("odeg-rep") + edgecov(collab.2) + nodeicov("bc-perc-2") + nodeifactor("dm") + nodeicov("committees-2"), seed = 12345)
+```{r, message = FALSE}
+clim.lsm.2 <- ergmm(climate2_reputation ~ euclidean(d=2, G=2) + edges + nodeocov("odeg-rep") + edgecov(climate2_collab) + 
+                      nodeicov("bc-perc-2") + nodeifactor("dm") + nodeicov("committees-2"), seed = 12345)
 summary(clim.lsm.2)
 plot(clim.lsm.2)
 ```
 
-# Model 3: Telecommunications
+### Network 3: Telecommunications
 
-#Data
+
+
+
+
+## Conclusion
+
+
+##### Appendix?
 ```{r}
-# data preparation
-rep.3 <- read.csv2("input/telecom-rep.csv", row.names = 1, header = TRUE)
-rep.3 <- network(as.matrix(rep.3))  # influence reputation network
-collab.3 <- read.csv2("input/telecom-collab.csv", row.names = 1, 
-    header = TRUE)
-for (i in 1:nrow(collab.3)) {
-  for (j in 1:ncol(collab.3)) {
-    if (is.na(collab.3[i, j])) {
-      collab.3[i, j] <- collab.3[j, i]
-    }
-    if (is.na(collab.3[i, j])) {  # i.e., both ij and ji are missing
-      collab.3[i, j] <- 0
-    }
-  }
-}
-collab.3 <- network(collab.3)  # collaboration network
-network::set.vertex.attribute(rep.3, "bc-perc-3", 100 * betweenness(collab.3, 
-    rescale = TRUE))  # betweenness centrality as a vertex attribute
-dm.3 <- read.csv2("input/telecom-dm.csv", row.names = 1, header = TRUE)
-network::set.vertex.attribute(rep.3, "dm", dm.3$dm)  # decision-maker?
-network::set.vertex.attribute(rep.3, "odeg-rep", degree(rep.3, 
-    cmode = "outdegree"))  # outdegree centrality as a vertex attribute
-committee.3 <- rowSums(read.csv2("input/telecom-committee.csv", 
-    row.names = 1, header = TRUE))
-network::set.vertex.attribute(rep.3, "committees-3", committee.3)
-    # number of committee memberships as a vertex attribute
-
 # save summary table for the appendix
-names.3 <- get.vertex.attribute(rep.3, "vertex.names")
-between_collab.3 <- 100 * betweenness(collab.3, rescale = TRUE)
-type.3 <- read.csv2("input/telecom-type.csv", row.names = 1, 
-    header = TRUE)
+# SWISS CLIMATE CHANGE 1 
+names.1 <- network::get.vertex.attribute(climate1_reputation, "vertex.names")
+between_climate1_collab <- 100 * sna::betweenness(climate1_collab, rescale = TRUE)
+committee.1 <- rowSums(com.1)
+type.1 <- read.csv2("data/input/climate9500-type.csv", row.names = 1, header = TRUE)
+appendix.1 <- data.frame(org = names.1, type3 = type.1[, 1], type5 = type.1[, 2], committees = committee.1, dm = dm.1$dm, betweenness = between_climate1_collab)
+
+# SWISS CLIMATE CHANGE 2
+names.2 <- network::get.vertex.attribute(climate2_reputation, "vertex.names")
+between_climate2_collab <- 100 * sna::betweenness(climate2_collab, rescale = TRUE)
+committee.2 <- rowSums(com.2)
+type.2 <- read.csv2("data/input/climate0205-type.csv", row.names = 1, header = TRUE)
+appendix.2 <- data.frame(org = names.2, type3 = type.2[, 1], 
+    type5 = type.2[, 2], committees = committee.2, dm = dm.2$dm, 
+    betweenness = between_climate2_collab)
+
+# sTELECOMMUNICATIONS
+names.3 <- network::get.vertex.attribute(tele_reputation, "vertex.names")
+between_collab.3 <- 100 * sna::betweenness(tele_collab, rescale = TRUE)
+type.3 <- read.csv2("input/telecom-type.csv", row.names = 1, header = TRUE)
 appendix.3 <- data.frame(org = names.3, type3 = type.3[, 1], 
     type5 = type.3[, 2], committees = committee.3, 
     dm = dm.3$dm, betweenness = between_collab.3)
 ```
-
-
-# Conclusion
-
-
