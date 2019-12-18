@@ -216,7 +216,47 @@ The second wave of analysis on the climate change policy uses the same variables
 The hypothesis that influence reputation is a hierarchical and acyclic social phenomenon seems to be proved here. If the alter is a decision maker, the odds of alter being identified as influential are greatly increased and that institutional integration of an actor via membership in policy committees significantly increases the likelihood of being rated as influential.
 
 ### Network 3: Telecommunications
+```{r}
+tele_collab <- network::network(tele_collab)  # collaboration network
+network::set.vertex.attribute(tele_reputation, "bc-perc", 100 * sna::betweenness(tele_collab, 
+    rescale = TRUE))  # betweenness centrality as a vertex attribute
+tele_dm <- read.csv2("data/input/telecom-dm.csv", row.names = 1, header = TRUE)
+network::set.vertex.attribute(tele_reputation, "dm", tele_dm$dm)  # decision-maker?
+network::set.vertex.attribute(tele_reputation, "odeg-rep", sna::degree(tele_reputation, 
+    cmode = "outdegree"))  # outdegree centrality as a vertex attribute
+tele_committee <- rowSums(read.csv2("data/input/telecom-committee.csv", 
+    row.names = 1, header = TRUE))
+network::set.vertex.attribute(tele_reputation, "committees", tele_committee)
+    # number of committee memberships as a vertex attribute
+```
 
+```{r, message = FALSE}
+telecommunication <- ergm(tele_reputation ~ edges + cyclicalties + transitiveties + mutual + nodeocov("odeg-rep") + 
+                  edgecov(tele_collab) + nodeicov("bc-perc") + nodeifactor("dm") + nodeicov("committees"), 
+                control = control.ergm(seed = 12345))
+summary(telecommunication)
+```
+
+```{r, message = FALSE}
+#LSM (telecommunications)
+# Check evidence for clustering, fit a set of candidate modelst
+tele.fit <-lapply(1:2, function(G){
+    ergmm(tele_reputation ~ euclidean(d=2, G=G) + edges + nodeocov("odeg-rep") + edgecov(tele_collab) +
+            nodeicov("bc-perc") + nodeifactor("dm") + nodeicov("committees"), seed = 12345)
+  })
+
+# Compute the BICs
+do.call(rbind,lapply(lapply(tele.fit ,bic.ergmm),as.data.frame))
+
+#Model with two clusters has the lowest overall BIC.
+```
+
+```{r, message = FALSE}
+clim.lsm.2 <- ergmm(climate2_reputation ~ euclidean(d=2, G=2) + edges + nodeocov("odeg-rep") + edgecov(climate2_collab) + 
+                      nodeicov("bc-perc-2") + nodeifactor("dm") + nodeicov("committees-2"), seed = 12345)
+summary(clim.lsm.2)
+plot(clim.lsm.2)
+```
 
 
 
