@@ -150,10 +150,10 @@ The edges term is similar to a constant in linear regression models and it indic
 The coefficient of cyclical ties is negative, which indicates an absence of cyclical ties. This supports the theory that influence reputation is a hierarchical and acyclic social phenomenon i.e if A rates B as influential and B rates C as influential, then it is unlikely that C will rate A as influential. This term is statistically significant.
 ```{r}
 par(mfrow=c(1,2))
-cyclical <- igraph::graph(edges =c("A","B", "B", "C", "C", "A"))
-plot(cyclical, mode="directed", main = "Cyclic")
-acyclical <- igraph::graph(edges =c("A","B", "B", "C"))
-plot(acyclical, mode="directed", layout=layout_in_circle, main = "Acyclic", directed = T)
+cyclic <- igraph::graph(edges =c("A","B", "B", "C", "C", "A"))
+plot(cyclic, mode="directed", main = "Cyclic")
+acyclic <- igraph::graph(edges =c("A","B", "B", "C"))
+plot(acyclic, mode="directed", layout=layout_in_circle, main = "Acyclic", directed = T)
 ```
 
 
