@@ -7,7 +7,7 @@ output:
   html_document: default
 ---
 
-# Introduction: (still editing)
+# Introduction:
 
 Effective and efficient policy making outcomes are strongly dependent on the negotiations and structures during the decision-making process. A primary assumption in the literature on collaborative and policy networks is that political outcomes are affected by a variety of state and non state actors. Past research about policy making aims at understanding how policy solutions are designed to resolve problems at the crucial agenda-setting stage and they attribute a strong role to ‘powerful’ actors in it (Ferris et al. 2007; Watkins and Rosengrant 1996).
 
@@ -121,7 +121,10 @@ The coefficient of cyclical ties is negative, which indicates an absence of cycl
 The coefficient for transitivity, which is a complementary effect that captures the hierarchical structure is positive and significant. However, in the paper this term is not statistically significant for this model.
 The authors also include the term reciprocity in the ergm "to control for the potential tendency of ties to be reciprocated in order to make sure that there are no omitted dependencies when we estimate our effects of interest." This term is positive but not statistically significant.  
 The outdegree centrality of ego (nodeocov.odeg-rep) controls for the number of judgments that ego makes in the whole network. In other words, this term controls for the individual baseline propensities of individuals in any dyad towards making positive or negative judgments. This term is positive and significant in both the models. 
-
+The next term is the presence of existing collaboration which relates to the second hypothesis of the authors. According to the coefficient of both the models, this term is positive and significant. Hence, we can say that an existing collaboration tie between ego and alter roughly quintuples the odds of ego reporting alter as being particularly influential, compared to dyads where a collaboration tie does not exist.
+The coefficient for betweenness centrality of the alter (bc-perc) in the collaboration network is positive and significant in both the models. This implies that the more the alter tries to occupy a strategic position in the network, the more likely it is that the ego finds the alter powerful or influential. 
+Along with the structural components, the authors also wanted to understand the institutional aspects of influence reputation. The coefficient of term dm.1 implies that if the alter is a decision maker, the odds of alter being identified as influential are more than doubled in the ergm and quadrupled in the latent space model, compared with cases where alter is not a decision maker, irrespective of whether ego is a decision maker.
+Lastly, the coefficient for term 'committees' is positive and significant in both the models. Hence, this implies that institutional integration of an actor via membership in policy committees significantly increases the likelihood of being rated as influential. 
 
 # Model 2: Climate Change second period
 
