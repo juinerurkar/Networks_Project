@@ -202,6 +202,10 @@ summary(clim.lsm.2)
 plot(clim.lsm.2)
 ```
 
+The second wave of analysis on the climate change policy uses the same variables and yields similar results. In both our latent space and ergm have a significant edges coefficient. We also find similarly negative and positive coefficients on cyclical and transitive ties and again the coefficient on cyclical ties is significant while the coefficient on transitive ties is not. We find that the outdegree centrality of ego, presence of existing collaboration and betweenness centrality of the alter all have positive coefficients and are significant. Overall the results for the second wave of data mirror that of the first wave. This is unsurprising and tells us that the nature of the hierarchical and structural networks have not changed over time.  
+
+The hypothesis that influence reputation is a hierarchical and acyclic social phenomenon seems to be proved here. If the alter is a decision maker, the odds of alter being identified as influential are greatly increased and that institutional integration of an actor via membership in policy committees significantly increases the likelihood of being rated as influential.
+
 ### Network 3: Telecommunications
 
 
