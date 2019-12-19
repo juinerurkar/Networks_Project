@@ -25,8 +25,8 @@ climate1_collab <- read.csv2("data/input/climate9500-collab.csv", row.names = 1,
 climate1_collab <- network(as.matrix(climate1_collab))  
 ```
 
+There are three actors in the first climate (AL, AZ, AJ) network that do not collaborate with anyone else in the network. Additionally, 
 ```{r}
-par(mfrow=c(1,2))
 plot(igraph::graph_from_adjacency_matrix(as.matrix(climate1_reputation)), main = "Influence Reputation Network - Climate 1") # influence 
 plot(igraph::graph_from_adjacency_matrix(as.matrix(climate1_collab)), main = "Collaboration - Climate 1") #collaboration 
 ```
@@ -40,7 +40,6 @@ climate2_collab <- network(as.matrix(climate2_collab))  # collaboration network
 ```
 
 ```{r}
-par(mfrow=c(1,2))
 plot(igraph::graph_from_adjacency_matrix(as.matrix(climate2_reputation)), main = "Influence Reputation Network - Climate 2") # influence 
 plot(igraph::graph_from_adjacency_matrix(as.matrix(climate2_collab)), main = "Collaboration - Climate 2") #collaboration 
 ```
@@ -69,10 +68,72 @@ for (i in 1:nrow(tele_collab)) {
 
 #### Telecommunications network 
 
+In the telecommunications network, four isolates indicating that there are four actors that are not identified to be to be influential however all actors collaborate with one another. 
+
 In the influence 
 ```{r}
-par(mfrow=c(1,2))
 plot(igraph::graph_from_adjacency_matrix(as.matrix(tele_reputation)), main = "Influence Reputaion Network - Telecommunications") # influence 
 plot(igraph::graph_from_adjacency_matrix(as.matrix(tele_collab)), main = "Collaboration - Telecommunications") #collaboration 
 ```
 
+### Network 3: Telecommunications
+```{r}
+tele_collab <- network::network(tele_collab)  # collaboration network
+network::set.vertex.attribute(tele_reputation, "bc-perc", 100 * sna::betweenness(tele_collab, 
+    rescale = TRUE))  # betweenness centrality as a vertex attribute
+tele_dm <- read.csv2("data/input/telecom-dm.csv", row.names = 1, header = TRUE)
+network::set.vertex.attribute(tele_reputation, "dm", tele_dm$dm)  # decision-maker?
+network::set.vertex.attribute(tele_reputation, "odeg-rep", sna::degree(tele_reputation, 
+    cmode = "outdegree"))  # outdegree centrality as a vertex attribute
+tele_committee <- rowSums(read.csv2("data/input/telecom-committee.csv", 
+    row.names = 1, header = TRUE))
+network::set.vertex.attribute(tele_reputation, "committees", tele_committee)
+    # number of committee memberships as a vertex attribute
+```
+
+```{r, message = FALSE}
+telecommunication <- ergm(tele_reputation ~ edges + cyclicalties + transitiveties + mutual + 
+                            nodeocov("odeg-rep") + edgecov(tele_collab) + nodeicov("bc-perc") +
+                            nodeifactor("dm") + nodeicov("committees"), 
+                control = control.ergm(seed = 12345))
+tele_ergm <- summary(telecommunication)
+tele_ergm$coefs
+```
+
+```{r, message = FALSE}
+#LSM (telecommunications)
+# Check evidence for clustering, fit a set of candidate modelst
+tele.fit <-lapply(1:4, function(G){
+    ergmm(tele_reputation ~ euclidean(d=2, G=2) + edges + cyclicalties + transitiveties + mutual +
+                    nodeocov("odeg-rep") + edgecov(tele_collab) + nodeicov("bc-perc") + nodeifactor("dm") +
+                    nodeicov("committees"), seed = 12345)
+  })
+
+# Compute the BICs
+do.call(rbind, lapply(lapply(tele.fit, bic.ergmm), as.data.frame))
+
+# Model with four clusters has the lowest overall BIC, however the BIC for two clusters has a similar BIC therefore we will choose the model with 2 clusters. 
+```
+
+```{r, message = FALSE}
+tele.lsm <- ergmm(tele_reputation ~ euclidean(d=2, G=2) + edges + cyclicalties + transitiveties + mutual +
+                    nodeocov("odeg-rep") + edgecov(tele_collab) + nodeicov("bc-perc") + nodeifactor("dm") +
+                    nodeicov("committees"),  seed = 12345)
+tele_ls_fit <- summary(tele.lsm)
+tele_ls_fit
+tele_ls_fit$mkl$beta
+plot(tele.lsm)
+```
+
+```{r}
+telecom_coefs <- data.frame(coefficients = c("edges", "cyclical ties", "transitive ties", 
+                                             "reciprocity", "out-degree of ego", "collaboration",
+                                             "betweenness of alter", "alter=decision maker", "committee membership"),
+                            ERGM = round(tele_ergm$coefs[,1],3),
+                            ERGM_pvalues = round(tele_ergm$coefs[,4],3),
+                            LSM = round(tele_ls_fit$pmean$coef.table[,1],3),
+                            LSM_pvalues = round(tele_ls_fit$pmean$coef.table[,4],3))
+telecom_coefs
+knitr::kable(telecom_coefs)
+xtable::xtable(telecom_coefs)
+```

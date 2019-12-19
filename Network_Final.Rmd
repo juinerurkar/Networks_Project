@@ -42,7 +42,7 @@ The authors mention three important hypotheses in the paper, which are as follow
 3. Actors with institutional decision making power tend to be perceived as particularly influential by other actors, irrespective of their structural position in the policy network.
 
 ## Data
-Ingold and Leifeld (2016) looked a four different policy networks for this analysis at two different time points in policy cycle stage. For the the purposes of our project we will look both decision-making policy networks and collaborative implementation networks in Switzerland. 
+Ingold and Leifeld (2016) looked a four different policy networks for this analysis at two different time points in policy cycle stage. For the the purposes of our project we will look both decision-making policy networks and collaborative implementation networks in Switzerland. For both networks, the respondents were asked similar questions. The first question asked to the respondents was which other organizations, their organization perceived as influential. These responses were converted into a sociomatrix with senders on the rows and receivers on the columns. This sociomatrix describes the hierarchical organization of the network. To capture the structural organization, the respondents were asked which other organizations they collaborated with through the process. Since collaboration is intuitively undirected, any missing data was filled in with this assumption. Another variable collected was a binary variable describing whether an actor has any decision making power or not. 
 
 The first analysis we choose to do concerns the climate change policy in Switzerland. This policy was at the national level and the data was collected during the decision making stage of the process. The main goal of the policy was to mitigate the emissions of green house gases by 10% by 2012. The data was collected at two stages, the first is at the launch of the policy and the second was when a major amendment to the policy was being decided upon. There were interviews conducted with 33 organizations involved with this legislation. The response rate was 100% and the final network included 4 government actors, 5 political parties, 11 organized interest parties, and 13 scientific, research or ecological parties. 
 	
@@ -283,11 +283,12 @@ telecom_coefs
 ```{r}
 # save summary table for the appendix
 # SWISS CLIMATE CHANGE 1 
-names.1 <- network::get.vertex.attribute(climate1_reputation, "vertex.names")
+names.1 <- network::get.vertex.attribute(network(climate1_reputation), "vertex.names")
 between_climate1_collab <- 100 * sna::betweenness(climate1_collab, rescale = TRUE)
 committee.1 <- rowSums(com.1)
 type.1 <- read.csv2("data/input/climate9500-type.csv", row.names = 1, header = TRUE)
-appendix.1 <- data.frame(org = names.1, type3 = type.1[, 1], type5 = type.1[, 2], committees = committee.1, dm = dm.1$dm, betweenness = between_climate1_collab)
+appendix.1 <- data.frame(org = names.1, type3 = type.1[, 1], type5 = type.1[, 2], 
+                         committees = committee.1, dm = dm.1$dm, betweenness = between_climate1_collab)
 
 # SWISS CLIMATE CHANGE 2
 names.2 <- network::get.vertex.attribute(climate2_reputation, "vertex.names")
