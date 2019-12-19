@@ -172,7 +172,7 @@ Along with the structural components, the authors also wanted to understand the 
 
 Lastly, the coefficient for term 'committees' is positive and significant in both the models. Hence, this implies that institutional integration of an actor via membership in policy committees significantly increases the likelihood of being rated as influential. 
 
-### Network 1: Climate Policy Time 2 : 2002 - 2005 
+### Network 2: Climate Policy Time 2 : 2002 - 2005 
 
 ```{r}
 # Data prep for ERGMs 
