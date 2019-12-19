@@ -292,7 +292,7 @@ telecom_coefs <- data.frame(coefficients = c("edges", "cyclical ties", "transiti
 telecom_coefs
 ```
 
-The relationships the actors in the telecommunications network is simlar to the climate change networks. There is a rpopensity for any dyad in the network to form ties. There is negative coefficeint for cyclical ties indicating that there an acyclic phenomenon occuring and a higher probability of transitive ties (A --+ B --+ C), as one would expect in hierarchical settings. There is a positive coefficient for out-degree of ego meaning that the more outgoing ties an actor has, the more likely the actor is to call another actor influential. Additionallyl, the betweenness centrality of the alter is significant, meaning that if if and actor occupies a strategic postion the ego will identify the alter as influential. 
+The relationships the actors in the telecommunications network is simlar to the climate change networks. There is a propensity for any dyad in the network to form ties. There is negative coefficeint for cyclical ties indicating that there an acyclic phenomenon occuring and a higher probability of transitive ties (A --+ B --+ C), as one would expect in hierarchical settings. There is a positive coefficient for out-degree of ego meaning that the more outgoing ties an actor has, the more likely the actor is to call another actor influential. Additionally, the betweenness centrality of the alter is significant, meaning that if if and actor occupies a strategic postion the ego will identify the alter as influential. 
 
 
 
