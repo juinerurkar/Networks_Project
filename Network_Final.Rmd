@@ -44,7 +44,7 @@ The authors mention three important hypotheses in the paper, which are as follow
 
 The authors model reputation by using an exponential random graph model (ERGM) with dyadic dependence and include terms for transitive and cyclical ties in order to control for the potentially hierarchical structure of the network.
 
-In addition to reproducing those ERGMs, we even tried to replicate their results using latent space models. Hoff et al describe social space as a space of unobserved latent characteristics that represent potential transitive tendencies in network relations. A probability measure over such unobserved characteristics induces a model in which the presence of a tie between two individuals is dependent on the presence of the other ties. For example: the presence of ties between i -> j and j-> k implies that i and k are not too far apart in the said social space. The ties in the network are assumed to be conditionally independent given these positions in the social space, and the probability of a specific tie between two individuals is modeled as some function of their positions. Since, this model automatically represents transitivity and can also take account of homophily on observed attributes (Handcock et al - 2007), in our models we included all the terms which the authors used in their ergm(s) except the terms for reciprocity, cyclical and transitive ties. 
+In addition to reproducing those ERGMs, we even tried to replicate their results using latent space models. Hoff et al. (2002) describe social space as a space of unobserved latent characteristics that represent potential transitive tendencies in network relations. A probability measure over such unobserved characteristics induces a model in which the presence of a tie between two individuals is dependent on the presence of the other ties. For example: the presence of ties between i -> j and j-> k implies that i and k are not too far apart in the said social space. The ties in the network are assumed to be conditionally independent given these positions in the social space, and the probability of a specific tie between two individuals is modeled as some function of their positions. Since, this model automatically represents transitivity and can also take account of homophily on observed attributes (Handcock et al - 2007), in our models we included all the terms which the authors used in their ergm(s) except the terms for reciprocity, cyclical and transitive ties. 
 
 ## Data
 Ingold and Leifeld (2016) looked a four different policy networks for this analysis at two different time points in policy cycle stage. For the the purposes of our project we will look both decision-making policy networks and collaborative implementation networks in Switzerland. For both networks, the respondents were asked similar questions. Respondents were first asked to identify which other organizations, their organization perceived as influential. These responses were converted into a sociomatrix with senders on the rows and receivers on the columns. This sociomatrix describes the hierarchical organization of the network. To capture the structural organization, the respondents were asked which other organizations they collaborated with through the process. Since collaboration is intuitively undirected, any missing data was filled in with this assumption. Another variable collected was a binary variable describing whether an actor has any decision making power or not. For both analyses, the data only included organizational actors as opposed to individuals. Furthermore, the actors in both cases were decided upon by a panel of experts and verified with the the respondents. 
@@ -109,7 +109,7 @@ plot(igraph::graph_from_adjacency_matrix(as.matrix(tele_collab)), main = "Collab
 ## Models: 
 Ingold and Leifeld (2016) were interested in using exponential random graph models (ERGMs) with dyadic dependence to be able to include a term for cyclical and transitive ties that account for the hierarchical structure of the network. In the three models below Ingold and Leifeld controlled for: 
 
-1. Edges (which )
+1. Edges
 2. Cyclical ties
 3. Transitive ties
 4. Reciprocity
@@ -161,6 +161,21 @@ clim.lsm.1 <- latentnet::ergmm(climate1_reputation ~ euclidean(d=2, G = 2) + edg
                                seed = 12345)
 summary(clim.lsm.1)
 plot(clim.lsm.1, cluster.col = c("blue", "red"))
+```
+
+```{r}
+clim1_ergm <- summary(climate1)
+clim1_lsm_fit <- summary(clim.lsm.1)
+clim1_coefs <- data.frame(coefficients = c("edges", "cyclical ties", "transitive ties", 
+                                             "reciprocity", "out-degree of ego", "collaboration",
+                                             "betweenness of alter", "alter=decision maker", "committee membership"),
+                            ERGM = round(clim1_ergm$coefs[,1],3),
+                            ERGM_pvalues = round(clim1_ergm$coefs[,4],3),
+                            LSM = c(round(clim1_lsm_fit$pmean$coef.table[1,1],3), "---", "---","---", 
+                                          round(clim1_lsm_fit$pmean$coef.table[2:6,1],3)),
+                            LSM_pvalues = c(round(clim1_lsm_fit$pmean$coef.table[1,4],3), "---", "---","---", 
+                                          round(clim1_lsm_fit$pmean$coef.table[2:6,4],3)))
+xtable::xtable(clim1_coefs)
 ```
 
 Results:
@@ -230,6 +245,21 @@ summary(clim.lsm.2)
 plot(clim.lsm.2)
 ```
 
+```{r}
+clim2_ergm <- summary(climate1)
+clim2_lsm_fit <- summary(clim.lsm.1)
+clim2_coefs <- data.frame(coefficients = c("edges", "cyclical ties", "transitive ties", 
+                                             "reciprocity", "out-degree of ego", "collaboration",
+                                             "betweenness of alter", "alter=decision maker", "committee membership"),
+                            ERGM = round(clim2_ergm$coefs[,1],3),
+                            ERGM_pvalues = round(clim2_ergm$coefs[,4],3),
+                            LSM = c(round(clim2_lsm_fit$pmean$coef.table[1,1],3), "---", "---","---", 
+                                          round(clim2_lsm_fit$pmean$coef.table[2:6,1],3)),
+                            LSM_pvalues = c(round(clim2_lsm_fit$pmean$coef.table[1,4],3), "---", "---","---", 
+                                          round(clim2_lsm_fit$pmean$coef.table[2:6,4],3)))
+xtable::xtable(clim2_coefs)
+```
+
 The second wave of analysis on the climate change policy uses the same variables and yields similar results. In both our latent space and ergm have a significant edges coefficient. We also find similarly negative and positive coefficients on cyclical and transitive ties and again the coefficient on cyclical ties is significant while the coefficient on transitive ties is not for the ergm. We find that the outdegree centrality of ego, presence of existing collaboration and betweenness centrality of the alter all have positive coefficients and are significant. Overall the results for the second wave of data mirror that of the first wave. This is unsurprising and tells us that the nature of the hierarchical and structural networks have not changed over time.  
 
 The hypothesis that influence reputation is a hierarchical and acyclic social phenomenon seems to be proved here. If the alter is a decision maker, the odds of alter being identified as influential are greatly increased and that institutional integration of an actor via membership in policy committees significantly increases the likelihood of being rated as influential.
@@ -261,9 +291,9 @@ tele_ergm$coefs
 
 ```{r, message = FALSE}
 #LSM (telecommunications)
-# Check evidence for clustering, fit a set of candidate modelst
+# Check evidence for clustering, fit a set of candidate models
 tele.fit <-lapply(1:4, function(G){
-    ergmm(tele_reputation ~ euclidean(d=2, G=2) + edges + cyclicalties + transitiveties + mutual +
+    ergmm(tele_reputation ~ euclidean(d=2, G=2) + edges + 
                     nodeocov("odeg-rep") + edgecov(tele_collab) + nodeicov("bc-perc") + nodeifactor("dm") +
                     nodeicov("committees"), seed = 12345)
   })
@@ -275,7 +305,7 @@ do.call(rbind, lapply(lapply(tele.fit, bic.ergmm), as.data.frame))
 ```
 
 ```{r, message = FALSE}
-tele.lsm <- ergmm(tele_reputation ~ euclidean(d=2, G=2) + edges + cyclicalties + transitiveties + mutual +
+tele.lsm <- ergmm(tele_reputation ~ euclidean(d=2, G=2) + 
                     nodeocov("odeg-rep") + edgecov(tele_collab) + nodeicov("bc-perc") + nodeifactor("dm") +
                     nodeicov("committees"),  seed = 12345)
 tele_ls_fit <- summary(tele.lsm)
@@ -290,9 +320,11 @@ telecom_coefs <- data.frame(coefficients = c("edges", "cyclical ties", "transiti
                                              "betweenness of alter", "alter=decision maker", "committee membership"),
                             ERGM = round(tele_ergm$coefs[,1],3),
                             ERGM_pvalues = round(tele_ergm$coefs[,4],3),
-                            LSM = round(tele_ls_fit$pmean$coef.table[,1],3),
-                            LSM_pvalues = round(tele_ls_fit$pmean$coef.table[,4],3))
-telecom_coefs
+                            LSM = c(round(tele_ls_fit$pmean$coef.table[1,1],3), "---", "---","---", 
+                                          round(tele_ls_fit$pmean$coef.table[2:6,1],3)),
+                            LSM_pvalues = c(round(tele_ls_fit$pmean$coef.table[1,4],3), "---", "---","---", 
+                                          round(tele_ls_fit$pmean$coef.table[2:6,4],3)))
+xtable::xtable(telecom_coefs)
 ```
 
 The relationships the actors in the telecommunications network is simlar to the climate change networks. There is a propensity for any dyad in the network to form ties. There is negative coefficeint for cyclical ties indicating that there an acyclic phenomenon occuring and a higher probability of transitive ties (A --+ B --+ C), as one would expect in hierarchical settings. There is a positive coefficient for out-degree of ego meaning that the more outgoing ties an actor has, the more likely the actor is to call another actor influential. Additionally, the betweenness centrality of the alter is significant, meaning that if if and actor occupies a strategic postion the ego will identify the alter as influential. 
