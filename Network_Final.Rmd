@@ -1,6 +1,6 @@
 ---
 title: "Network_Final"
-author: "Nerurkar Jui A"
+author: "Devin Khosla, Jenny Liu, Jui A. Nerurkar"
 date: "12/14/2019"
 output:
   html_document: default
