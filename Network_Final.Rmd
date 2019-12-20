@@ -3,8 +3,8 @@ title: "Network_Final"
 author: "Nerurkar Jui A"
 date: "12/14/2019"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 ```{r setup, include=FALSE, message=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -137,8 +137,9 @@ network::set.vertex.attribute(climate1_reputation, "committees", rowSums(com.1))
 
 #### ERGM
 ```{r, message = FALSE}
-climate1 <- ergm(climate1_reputation ~ edges + cyclicalties + transitiveties + mutual + nodeocov("odeg-rep") +
-                   edgecov(climate1_collab) + nodeicov("bc-perc") + nodeifactor("dm") + nodeicov("committees"), 
+climate1 <- ergm(climate1_reputation ~ edges + cyclicalties + transitiveties + mutual + 
+                   nodeocov("odeg-rep") + edgecov(climate1_collab) + nodeicov("bc-perc") + 
+                   nodeifactor("dm") + nodeicov("committees"), 
                  control = control.ergm(seed = 12345))  # ERGM (model 1)
 summary(climate1)
 ```
@@ -147,7 +148,8 @@ summary(climate1)
 ```{r, message = FALSE}
 # Check evidence for clustering, fit a set of candidate models
 fits.1 <-lapply(1:2, function(G){
-    ergmm(climate1_reputation ~ euclidean(d=2, G=G) + edges + nodeocov("odeg-rep") + edgecov(climate1_collab) + nodeicov("bc-perc") + nodeifactor("dm") + nodeicov("committees"), seed = 12345)
+    ergmm(climate1_reputation ~ euclidean(d=2, G=G) + edges + nodeocov("odeg-rep") + edgecov(climate1_collab) +
+            nodeicov("bc-perc") + nodeifactor("dm") + nodeicov("committees"), seed = 12345)
   })
 
 # Compute the BICs
@@ -221,7 +223,10 @@ network::set.vertex.attribute(climate2_reputation, "committees-2", rowSums(com.2
 
 #### ERGM
 ```{r, message = FALSE}
-climate2 <- ergm(climate2_reputation ~ edges + cyclicalties + transitiveties + mutual + nodeocov("odeg-rep") + edgecov(climate2_collab) + nodeicov("bc-perc-2") + nodeifactor("dm") + nodeicov("committees-2"), control = control.ergm(seed = 12345))  # ERGM (model 2)
+climate2 <- ergm(climate2_reputation ~ edges + cyclicalties + transitiveties + mutual + 
+                   nodeocov("odeg-rep") + edgecov(climate2_collab) + nodeicov("bc-perc-2") + 
+                   nodeifactor("dm") + nodeicov("committees-2"), 
+                 control = control.ergm(seed = 12345))  # ERGM (model 2)
 summary(climate2)
 ```
 
@@ -230,7 +235,9 @@ summary(climate2)
 #LSM (model 2)
 # Check evidence for clustering, fit a set of candidate models
 fits.2 <-lapply(1:2, function(G){
-    ergmm(climate2_reputation ~ euclidean(d=2, G=G) + edges + nodeocov("odeg-rep") + edgecov(climate1_collab) + nodeicov("bc-perc") + nodeifactor("dm") + nodeicov("committees"), seed = 12345)
+    ergmm(climate2_reputation ~ euclidean(d=2, G=G) + edges + nodeocov("odeg-rep") + 
+            edgecov(climate2_collab) + nodeicov("bc-perc-2") + nodeifactor("dm") + 
+            nodeicov("committees-2"), seed = 12345)
   })
 
 # Compute the BICs
@@ -240,9 +247,11 @@ do.call(rbind,lapply(lapply(fits.2 ,bic.ergmm),as.data.frame))
 ```
 
 ```{r, message = FALSE}
-clim.lsm.2 <- ergmm(climate2_reputation ~ euclidean(d=2, G=2) + edges + nodeocov("odeg-rep") + edgecov(climate1_collab) + nodeicov("bc-perc") + nodeifactor("dm") + nodeicov("committees"), seed = 12345)
+clim.lsm.2 <- ergmm(climate2_reputation ~ euclidean(d=2, G=2) + edges + nodeocov("odeg-rep") +
+                      edgecov(climate2_collab) + nodeicov("bc-perc-2") + 
+                      nodeifactor("dm") + nodeicov("committees-2"), seed = 12345)
 summary(clim.lsm.2)
-plot(clim.lsm.2)
+#plot(clim.lsm.2)
 ```
 
 ```{r}
@@ -342,16 +351,16 @@ The authors main hypotheses are:
 We replicate the ergms for both waves of the climate change policy data and the telecommunications policy in Switzerland. The original paper found these hypotheses to be true and our replication of these ergms were consistent with their findings. Furthermore, our results when running LSM's on these same network datasets revealed similar results. 
 
 
-References:
-Ingold, K. and Leifeld, P.  - Structural and Institutional Determinants of Influence Reputation: A Comparison of Collaborative and Adversarial Policy Networks in Decision Making and Implementation (2016)
-Ferris, G., Darren, T., Perrewe, P., Brouer, R., Douglas, C. and Lux, S. – Political skill in organizations (2007)
-Watkins, M., and Rosengrant, S. -  Sources on power in coalition building (1996)
-Montjoy, R. S., and Watson, D. J. -  A case for reinterpreted dichotomy of politics and administration as a professional standard in council-manager government (1995)
-Svara, J. H.  - The politics-administration dichotomy model as aberration (1998)
-Börzel, T. A. - What’s so special about policy networks? An exploration of the concept and its usefulness in studying European governance (1997)
-Peterson, J., and Bomberg, E. -  Decision-making in the European Union (2009)
-Hoff, P.D, Raftery, A.E, and Handcock, M. S – Latent Space Approaches to Social Network Analysis (2002)
-Handcock, M.S, Raftery A.E, and Tantrum J.M – Model -based clustering for social networks (2007)
+#### References:
+1. Ingold, K. and Leifeld, P.  - Structural and Institutional Determinants of Influence Reputation: A Comparison of Collaborative and Adversarial Policy Networks in Decision Making and Implementation (2016)
+2. Ferris, G., Darren, T., Perrewe, P., Brouer, R., Douglas, C. and Lux, S. – Political skill in organizations (2007)
+3. Watkins, M., and Rosengrant, S. -  Sources on power in coalition building (1996)
+4. Montjoy, R. S., and Watson, D. J. -  A case for reinterpreted dichotomy of politics and administration as a professional standard in council-manager government (1995)
+5. Svara, J. H.  - The politics-administration dichotomy model as aberration (1998)
+6. Börzel, T. A. - What’s so special about policy networks? An exploration of the concept and its usefulness in studying European governance (1997)
+7. Peterson, J., and Bomberg, E. -  Decision-making in the European Union (2009)
+8. Hoff, P.D, Raftery, A.E, and Handcock, M. S – Latent Space Approaches to Social Network Analysis (2002)
+9. Handcock, M.S, Raftery A.E, and Tantrum J.M – Model -based clustering for social networks (2007)
 
 
 
