@@ -6,7 +6,7 @@ output:
   pdf_document: default
   html_document: default
 ---
-```{r setup, include=FALSE, messageFALSE}
+```{r setup, include=FALSE, message=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(tidy = TRUE)
 library(network) 
@@ -297,36 +297,7 @@ telecom_coefs
 
 The relationships the actors in the telecommunications network is simlar to the climate change networks. There is a propensity for any dyad in the network to form ties. There is negative coefficeint for cyclical ties indicating that there an acyclic phenomenon occuring and a higher probability of transitive ties (A --+ B --+ C), as one would expect in hierarchical settings. There is a positive coefficient for out-degree of ego meaning that the more outgoing ties an actor has, the more likely the actor is to call another actor influential. Additionally, the betweenness centrality of the alter is significant, meaning that if if and actor occupies a strategic postion the ego will identify the alter as influential. 
 
-
-
 ## Conclusion
 
 
-##### Appendix?
-```{r}
-# save summary table for the appendix
-# SWISS CLIMATE CHANGE 1 
-names.1 <- network::get.vertex.attribute(network(climate1_reputation), "vertex.names")
-between_climate1_collab <- 100 * sna::betweenness(climate1_collab, rescale = TRUE)
-committee.1 <- rowSums(com.1)
-type.1 <- read.csv2("data/input/climate9500-type.csv", row.names = 1, header = TRUE)
-appendix.1 <- data.frame(org = names.1, type3 = type.1[, 1], type5 = type.1[, 2], 
-                         committees = committee.1, dm = dm.1$dm, betweenness = between_climate1_collab)
 
-# SWISS CLIMATE CHANGE 2
-names.2 <- network::get.vertex.attribute(climate2_reputation, "vertex.names")
-between_climate2_collab <- 100 * sna::betweenness(climate2_collab, rescale = TRUE)
-committee.2 <- rowSums(com.2)
-type.2 <- read.csv2("data/input/climate0205-type.csv", row.names = 1, header = TRUE)
-appendix.2 <- data.frame(org = names.2, type3 = type.2[, 1], 
-    type5 = type.2[, 2], committees = committee.2, dm = dm.2$dm, 
-    betweenness = between_climate2_collab)
-
-# TELECOMMUNICATIONS
-names.3 <- network::get.vertex.attribute(tele_reputation, "vertex.names")
-between_collab.3 <- 100 * sna::betweenness(tele_collab, rescale = TRUE)
-type.3 <- read.csv2("input/telecom-type.csv", row.names = 1, header = TRUE)
-appendix.3 <- data.frame(org = names.3, type3 = type.3[, 1], 
-    type5 = type.3[, 2], committees = committee.3, 
-    dm = dm.3$dm, betweenness = between_collab.3)
-```
