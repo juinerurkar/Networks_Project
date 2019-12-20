@@ -331,5 +331,21 @@ The relationships the actors in the telecommunications network is simlar to the 
 
 ## Conclusion
 
+The authors main hypotheses are:
+
+1. The higher the betweenness centrality of alter in a collaboration or contact network, the more likely ego is to report alter as being particularly influential.
+
+2. Collaboration between ego and alter leads ego to report alter as being particularly influential.
+
+3. Actors with institutional decision making power tend to be perceived as particularly influential by other actors, irrespective of their structural position in the policy network.
+
+We replicate the ergms for both waves of the climate change policy data and the telecommunications policy in Switzerland. The original paper found these hypotheses to be true and our replication of these ergms were consistent with their findings. Furthermore, our results when running LSM's on these same netwrok datasets revealed similar results. 
+
+
+
+
+
+
+
 
 
