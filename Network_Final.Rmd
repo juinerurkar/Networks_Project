@@ -143,7 +143,7 @@ summary(climate1)
 ```{r, message = FALSE}
 # Check evidence for clustering, fit a set of candidate models
 fits.1 <-lapply(1:2, function(G){
-    ergmm(climate1_reputation ~ euclidean(d=2, G=G) + edges + mutual + nodeocov("odeg-rep") + edgecov(climate1_collab) + nodeicov("bc-perc") + nodeifactor("dm") + nodeicov("committees"), seed = 12345)
+    ergmm(climate1_reputation ~ euclidean(d=2, G=G) + edges + nodeocov("odeg-rep") + edgecov(climate1_collab) + nodeicov("bc-perc") + nodeifactor("dm") + nodeicov("committees"), seed = 12345)
   })
 
 # Compute the BICs
@@ -153,7 +153,7 @@ do.call(rbind,lapply(lapply(fits.1 ,bic.ergmm),as.data.frame))
 ```
 
 ```{r, message = FALSE}
-clim.lsm.1 <- latentnet::ergmm(climate1_reputation ~ euclidean(d=2, G = 2) + edges + mutual + nodeocov("odeg-rep") + edgecov(climate1_collab) + nodeicov("bc-perc") + nodeifactor("dm") + nodeicov("committees"), 
+clim.lsm.1 <- latentnet::ergmm(climate1_reputation ~ euclidean(d=2, G = 2) + edges + nodeocov("odeg-rep") + edgecov(climate1_collab) + nodeicov("bc-perc") + nodeifactor("dm") + nodeicov("committees"), 
                                seed = 12345)
 summary(clim.lsm.1)
 plot(clim.lsm.1, cluster.col = c("blue", "red"))
@@ -211,7 +211,7 @@ summary(climate2)
 #LSM (model 2)
 # Check evidence for clustering, fit a set of candidate models
 fits.2 <-lapply(1:2, function(G){
-    ergmm(climate2_reputation ~ euclidean(d=2, G=G) + edges + mutual + nodeocov("odeg-rep") + edgecov(climate1_collab) + nodeicov("bc-perc") + nodeifactor("dm") + nodeicov("committees"), seed = 12345)
+    ergmm(climate2_reputation ~ euclidean(d=2, G=G) + edges + nodeocov("odeg-rep") + edgecov(climate1_collab) + nodeicov("bc-perc") + nodeifactor("dm") + nodeicov("committees"), seed = 12345)
   })
 
 # Compute the BICs
@@ -221,7 +221,7 @@ do.call(rbind,lapply(lapply(fits.2 ,bic.ergmm),as.data.frame))
 ```
 
 ```{r, message = FALSE}
-clim.lsm.2 <- ergmm(climate2_reputation ~ euclidean(d=2, G=2) + edges + mutual + nodeocov("odeg-rep") + edgecov(climate1_collab) + nodeicov("bc-perc") + nodeifactor("dm") + nodeicov("committees"), seed = 12345)
+clim.lsm.2 <- ergmm(climate2_reputation ~ euclidean(d=2, G=2) + edges + nodeocov("odeg-rep") + edgecov(climate1_collab) + nodeicov("bc-perc") + nodeifactor("dm") + nodeicov("committees"), seed = 12345)
 summary(clim.lsm.2)
 plot(clim.lsm.2)
 ```
