@@ -339,7 +339,21 @@ The authors main hypotheses are:
 
 3. Actors with institutional decision making power tend to be perceived as particularly influential by other actors, irrespective of their structural position in the policy network.
 
-We replicate the ergms for both waves of the climate change policy data and the telecommunications policy in Switzerland. The original paper found these hypotheses to be true and our replication of these ergms were consistent with their findings. Furthermore, our results when running LSM's on these same netwrok datasets revealed similar results. 
+We replicate the ergms for both waves of the climate change policy data and the telecommunications policy in Switzerland. The original paper found these hypotheses to be true and our replication of these ergms were consistent with their findings. Furthermore, our results when running LSM's on these same network datasets revealed similar results. 
+
+
+References:
+Ingold, K. and Leifeld, P.  - Structural and Institutional Determinants of Influence Reputation: A Comparison of Collaborative and Adversarial Policy Networks in Decision Making and Implementation (2016)
+Ferris, G., Darren, T., Perrewe, P., Brouer, R., Douglas, C. and Lux, S. – Political skill in organizations (2007)
+Watkins, M., and Rosengrant, S. -  Sources on power in coalition building (1996)
+Montjoy, R. S., and Watson, D. J. -  A case for reinterpreted dichotomy of politics and administration as a professional standard in council-manager government (1995)
+Svara, J. H.  - The politics-administration dichotomy model as aberration (1998)
+Börzel, T. A. - What’s so special about policy networks? An exploration of the concept and its usefulness in studying European governance (1997)
+Peterson, J., and Bomberg, E. -  Decision-making in the European Union (2009)
+Hoff, P.D, Raftery, A.E, and Handcock, M. S – Latent Space Approaches to Social Network Analysis (2002)
+Handcock, M.S, Raftery A.E, and Tantrum J.M – Model -based clustering for social networks (2007)
+
+
 
 
 
